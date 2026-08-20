@@ -1,6 +1,8 @@
 import { MetadataRoute } from "next";
 import { getTenantByDomainOrSlug } from "@/lib/tenant";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap({
   params,
 }: {

@@ -19,6 +19,9 @@ interface PageProps {
   params: { domain: string };
 }
 
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
 // 1. Geração Dinâmica de Metadados de SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const tenant = await getTenantByDomainOrSlug(params.domain);

@@ -15,6 +15,9 @@ interface TenantLayoutProps {
   params: { domain: string };
 }
 
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
 export default async function TenantLayout({
   children,
   params,
