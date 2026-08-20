@@ -24,42 +24,63 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Remove porta para comparação
-  const currentHost = hostname.replace(`:${url.port}`, "");
-
-  let tenantIdentifier = "dall-automacao";
+  // Remove porta e remove prefixo www. para normalização
+  const cleanHost = hostname.replace(`:${url.port}`, "").toLowerCase();
+  const currentHost = cleanHost.replace(/^www\./, "");
 
   const isLocalhost =
-    hostname.includes("localhost") || hostname.includes("127.0.0.1");
+    currentHost.includes("localhost") || currentHost.includes("127.0.0.1");
+
+  let tenantIdentifier = "dall-automacao";
+  let rewritePath = "";
+
+  const pathParts = path.split("/").filter(Boolean);
+  const firstSegment = pathParts[0];
 
   if (isLocalhost) {
-    if (hostname.includes(".localhost")) {
-      tenantIdentifier = hostname.split(".localhost")[0];
+    if (currentHost.includes(".localhost")) {
+      // Ex: catuto.localhost:3000 -> tenant = "catuto"
+      tenantIdentifier = currentHost.split(".localhost")[0];
+      rewritePath = `/${tenantIdentifier}${path === "/" ? "" : path}`;
+    } else if (firstSegment) {
+      // Ex: localhost:3000/catuto
+      tenantIdentifier = firstSegment;
+      const subPath = pathParts.slice(1).join("/");
+      rewritePath = `/${tenantIdentifier}${subPath ? `/${subPath}` : ""}`;
     } else {
       tenantIdentifier = "dall-automacao";
+      rewritePath = `/${tenantIdentifier}`;
     }
-  } else if (hostname.endsWith(".vercel.app")) {
-    // Deploy gratuito na Vercel: carrega o tenant padrão de demonstração
-    tenantIdentifier = "dall-automacao";
-  } else if (hostname === rootDomain || hostname === `www.${rootDomain}`) {
-    // Domínio raiz configurado
-    tenantIdentifier = "dall-automacao";
-  } else if (hostname.endsWith(`.${rootDomain}`)) {
-    // Subdomínio da plataforma (ex: dall.suaplataforma.com.br)
-    tenantIdentifier = hostname.replace(`.${rootDomain}`, "");
-  } else {
-    // Domínio personalizado do cliente (ex: dallautomacao.com.br)
-    tenantIdentifier = currentHost;
-  }
-
-  // Evita duplicação do slug no path
-  let rewritePath = `/${tenantIdentifier}`;
-  if (path !== "/") {
-    if (path.startsWith(`/${tenantIdentifier}`)) {
-      rewritePath = path;
+  } else if (currentHost.endsWith(".vercel.app")) {
+    // Acesso pelo domínio da Vercel (ex: digital-service-display.vercel.app)
+    if (firstSegment) {
+      // Ex: digital-service-display.vercel.app/catuto -> carrega o tenant "catuto"
+      tenantIdentifier = firstSegment;
+      const subPath = pathParts.slice(1).join("/");
+      rewritePath = `/${tenantIdentifier}${subPath ? `/${subPath}` : ""}`;
     } else {
-      rewritePath = `/${tenantIdentifier}${path}`;
+      // Acesso à raiz sem slug: carrega o tenant padrão de demonstração
+      tenantIdentifier = "dall-automacao";
+      rewritePath = `/${tenantIdentifier}`;
     }
+  } else if (currentHost === rootDomain) {
+    // Domínio principal da plataforma SaaS
+    if (firstSegment) {
+      tenantIdentifier = firstSegment;
+      const subPath = pathParts.slice(1).join("/");
+      rewritePath = `/${tenantIdentifier}${subPath ? `/${subPath}` : ""}`;
+    } else {
+      tenantIdentifier = "dall-automacao";
+      rewritePath = `/${tenantIdentifier}`;
+    }
+  } else if (currentHost.endsWith(`.${rootDomain}`)) {
+    // Subdomínio da plataforma (ex: catuto.plataforma.com.br)
+    tenantIdentifier = currentHost.replace(`.${rootDomain}`, "");
+    rewritePath = `/${tenantIdentifier}${path === "/" ? "" : path}`;
+  } else {
+    // Domínio próprio do cliente (ex: catuto.com.br ou dallautomacao.com.br)
+    tenantIdentifier = currentHost;
+    rewritePath = `/${tenantIdentifier}${path === "/" ? "" : path}`;
   }
 
   const responseUrl = new URL(rewritePath, req.url);

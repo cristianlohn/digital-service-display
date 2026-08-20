@@ -57,14 +57,18 @@ export async function getTenantByDomainOrSlug(
     }
   }
 
+  const withoutWww = cleanIdentifier.replace(/^www\./, "");
+
   try {
     // 1. Tenta buscar por Custom Domain ou Slug
     let tenant = await prisma.tenant.findFirst({
       where: {
         OR: [
           { custom_domain: cleanIdentifier },
+          { custom_domain: withoutWww },
           { slug: slugOrDomain },
           { slug: cleanIdentifier },
+          { slug: withoutWww },
         ],
         status: "ACTIVE",
       },
