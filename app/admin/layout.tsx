@@ -100,6 +100,16 @@ export default async function AdminLayout({
               <Users size={18} className="text-slate-400" />
               <span>Leads & Contatos</span>
             </Link>
+
+            {user.role === "SUPER_ADMIN" && (
+              <Link
+                href="/admin/users"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-emerald-400/90 hover:bg-slate-800 hover:text-emerald-300 transition-colors border-t border-slate-800/80 pt-3 mt-2"
+              >
+                <Shield size={18} className="text-emerald-400" />
+                <span>Gestão de Usuários</span>
+              </Link>
+            )}
           </nav>
         </div>
 

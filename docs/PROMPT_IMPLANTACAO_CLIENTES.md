@@ -120,17 +120,45 @@ Gere o código TypeScript do script de seed (ou inserção via Prisma) para incl
 - **Meta Title**: [Ex: Nome da Empresa | Serviços em Cidade - UF]
 - **Meta Description**: [Ex: Projetos elétricos, laudos e automação em Joinville e região...]
 - **Palavras-chave**: [engenharia joinville, automação residencial sc, laudo spda]
+
+---
+
+### 10. USUÁRIO GESTOR DO CLIENTE (PAINEL ADMIN)
+- **Nome do Gestor**: [Ex: João da Silva]
+- **E-mail de Login**: [Ex: contato@empresa.com.br]
+- **Senha Inicial**: [Ex: Empresa@2024]
+- **Nível de Acesso**: [Gestor de Empresa / TENANT_ADMIN]
 ```
 
 ---
 
-## 🛠️ Como Executar a Inserção do Novo Cliente
+## 🛠️ Como Cadastrar os Usuários das Novas Empresas
 
-Depois que o script ou seed for gerado:
+Você tem **2 formas simples** de cadastrar gestores:
 
-1. Adicione a função no arquivo [`prisma/seed.ts`](../prisma/seed.ts) ou crie um arquivo isolado `prisma/seed-[cliente].ts`.
-2. Execute o comando no terminal:
-   ```bash
-   npx tsx prisma/seed.ts
-   ```
-3. O cliente estará imediatamente disponível em `/[slug]` ou no seu domínio próprio configurado!
+### Opção 1: Diretamente pelo Painel Administrativo (Recomendado)
+1. Acesse [`/admin/users`](https://www.catuto.com.br/admin/users) logado com o **Super Admin** (`admin@catuto.com.br`).
+2. Preencha o Nome, E-mail, Senha e selecione a **Empresa Vinculada**.
+3. Clique em **Cadastrar Usuário**. O cliente já poderá fazer login e gerenciar apenas o site dele!
+
+### Opção 2: Via Script de Seed Automatizado
+No script `prisma/seed-[cliente].ts`, inclua a criação com hash seguro:
+```typescript
+const salt = await bcrypt.genSalt(10);
+await prisma.adminUser.upsert({
+  where: { email: "contato@novocliente.com.br" },
+  update: {
+    name: "Gestor Novo Cliente",
+    password_hash: await bcrypt.hash("Cliente@2024", salt),
+    role: "TENANT_ADMIN",
+    tenant_id: tenant.id,
+  },
+  create: {
+    name: "Gestor Novo Cliente",
+    email: "contato@novocliente.com.br",
+    password_hash: await bcrypt.hash("Cliente@2024", salt),
+    role: "TENANT_ADMIN",
+    tenant_id: tenant.id,
+  },
+});
+```
