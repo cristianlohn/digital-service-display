@@ -1,4 +1,5 @@
 import { PrismaClient, TenantStatus } from "@prisma/client";
+import { seedCatuto } from "./seed-catuto";
 
 const prisma = new PrismaClient();
 
@@ -259,6 +260,9 @@ async function main() {
 
   console.log(`✅ Tenant criado com sucesso: ${tenant.name} (Slug: ${tenant.slug})`);
   console.log(`🚀 Custom Domain: ${tenant.custom_domain}`);
+
+  // Seed do tenant Catuto Soluções Digitais
+  await seedCatuto();
 }
 
 main()
