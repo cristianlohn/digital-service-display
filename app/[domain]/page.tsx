@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import Link from "next/link";
 import { getTenantByDomainOrSlug } from "@/lib/tenant";
 import { generateJsonLd } from "@/lib/schema";
 
@@ -14,6 +14,7 @@ import { FAQSection } from "@/components/public/FAQSection";
 import { ContactSection } from "@/components/public/ContactSection";
 import { Footer } from "@/components/public/Footer";
 import { FloatingWhatsApp } from "@/components/public/FloatingWhatsApp";
+import { Shield, LayoutDashboard, RefreshCw } from "lucide-react";
 
 interface PageProps {
   params: { domain: string };
@@ -28,8 +29,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!tenant) {
     return {
-      title: "Empresa não encontrada",
-      description: "A página solicitada não existe ou foi desativada.",
+      title: "Digital Service Display | Plataforma White-Label",
+      description: "Plataforma multitenant de exibição de serviços profissionais.",
     };
   }
 
@@ -89,8 +90,43 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function TenantPage({ params }: PageProps) {
   const tenant = await getTenantByDomainOrSlug(params.domain);
 
+  // Fallback amigável caso o banco ainda esteja inicializando
   if (!tenant) {
-    notFound();
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white p-6 text-center">
+        <div className="max-w-md space-y-6">
+          <div className="h-16 w-16 mx-auto rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+            <Shield size={36} />
+          </div>
+
+          <h2 className="text-2xl font-bold">
+            Plataforma em Inicialização
+          </h2>
+
+          <p className="text-sm text-slate-400 leading-relaxed">
+            O sistema está aguardando a conexão com o banco de dados Supabase ou a identificação do tenant.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+            <Link
+              href="/admin"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white text-slate-950 font-bold px-6 py-3 text-xs shadow hover:bg-slate-100 transition-all"
+            >
+              <LayoutDashboard size={16} />
+              <span>Acessar Painel /admin</span>
+            </Link>
+
+            <a
+              href="/"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-800 text-white font-bold px-6 py-3 text-xs border border-slate-700 hover:bg-slate-700 transition-all"
+            >
+              <RefreshCw size={16} />
+              <span>Recarregar Página</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const { settings } = tenant;

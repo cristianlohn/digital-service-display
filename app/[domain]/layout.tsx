@@ -1,5 +1,4 @@
 import { getTenantByDomainOrSlug } from "@/lib/tenant";
-import { notFound } from "next/navigation";
 
 interface TenantLayoutProps {
   children: React.ReactNode;
@@ -15,12 +14,8 @@ export default async function TenantLayout({
 }: TenantLayoutProps) {
   const tenant = await getTenantByDomainOrSlug(params.domain);
 
-  if (!tenant) {
-    notFound();
-  }
-
-  const primaryColor = tenant.theme?.primary_color || "#0b192c";
-  const secondaryColor = tenant.theme?.secondary_color || "#ff6500";
+  const primaryColor = tenant?.theme?.primary_color || "#0b192c";
+  const secondaryColor = tenant?.theme?.secondary_color || "#ff6500";
 
   return (
     <div

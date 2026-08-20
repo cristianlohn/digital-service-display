@@ -17,51 +17,53 @@ export default async function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get("host") || "localhost:3000";
   const path = url.pathname;
-
-  // Root domain da plataforma configurado nas variáveis de ambiente
   const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000";
 
-  // Identificação de ambiente de desenvolvimento ou subdomínio/domínio customizado
-  let currentHost = hostname.replace(`:${url.port}`, ""); // Remove porta para comparação limpa
-
-  // Verifica se é rota do painel administrativo global (/admin) ou api
+  // Se for rota administrativa (/admin) ou api, mantém sem reescrita
   if (path.startsWith("/admin") || path.startsWith("/api/admin")) {
     return NextResponse.next();
   }
 
-  // Define o domínio/slug do tenant
-  let tenantIdentifier = "dall-automacao"; // Fallback padrão de teste
+  // Remove porta para comparação
+  const currentHost = hostname.replace(`:${url.port}`, "");
+
+  let tenantIdentifier = "dall-automacao";
 
   const isLocalhost =
     hostname.includes("localhost") || hostname.includes("127.0.0.1");
 
   if (isLocalhost) {
     if (hostname.includes(".localhost")) {
-      // Ex: dall.localhost:3000 -> tenant = "dall"
       tenantIdentifier = hostname.split(".localhost")[0];
     } else {
-      // localhost:3000 direto
       tenantIdentifier = "dall-automacao";
     }
   } else if (hostname.endsWith(".vercel.app")) {
-    // Vercel Free / Preview Deployments (ex: meu-projeto.vercel.app)
-    // Se a rota for raiz, carrega o tenant padrão de teste ("dall-automacao")
+    // Deploy gratuito na Vercel: carrega o tenant padrão de demonstração
     tenantIdentifier = "dall-automacao";
   } else if (hostname === rootDomain || hostname === `www.${rootDomain}`) {
-    // Acesso ao domínio principal da plataforma SaaS
-    tenantIdentifier = "platform-home";
+    // Domínio raiz configurado
+    tenantIdentifier = "dall-automacao";
   } else if (hostname.endsWith(`.${rootDomain}`)) {
-    // Subdomínio da plataforma: ex: dall.plataforma.com.br -> "dall"
+    // Subdomínio da plataforma (ex: dall.suaplataforma.com.br)
     tenantIdentifier = hostname.replace(`.${rootDomain}`, "");
   } else {
-    // Domínio próprio / custom domain: ex: dallautomacao.com.br
+    // Domínio personalizado do cliente (ex: dallautomacao.com.br)
     tenantIdentifier = currentHost;
   }
 
-  // Clona a URL para reescrita interna no App Router
-  const responseUrl = new URL(`/${tenantIdentifier}${path === "/" ? "" : path}`, req.url);
+  // Evita duplicação do slug no path
+  let rewritePath = `/${tenantIdentifier}`;
+  if (path !== "/") {
+    if (path.startsWith(`/${tenantIdentifier}`)) {
+      rewritePath = path;
+    } else {
+      rewritePath = `/${tenantIdentifier}${path}`;
+    }
+  }
 
-  // Propaga o header com o tenant identificado
+  const responseUrl = new URL(rewritePath, req.url);
+
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set("x-tenant-domain", tenantIdentifier);
   requestHeaders.set("x-tenant-host", hostname);
