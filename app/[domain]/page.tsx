@@ -23,7 +23,7 @@ interface PageProps {
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
-// 1. Geração Dinâmica de Metadados de SEO
+// 1. Geração Dinâmica de Metadados de SEO & Cartão WhatsApp (Open Graph)
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const tenant = await getTenantByDomainOrSlug(params.domain);
 
@@ -38,12 +38,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title =
     seo_config?.meta_title ||
-    `${tenant.name} | Soluções em Engenharia e Automação`;
+    `${tenant.name} | Soluções Digitais & Serviços Profissionais`;
 
   const description =
     seo_config?.meta_description ||
     content?.hero_subtitle ||
-    `Serviços especializados de ${tenant.name}.`;
+    `Conheça os serviços especializados e solicite seu orçamento com ${tenant.name}.`;
 
   const canonicalUrl =
     seo_config?.canonical_url ||
@@ -51,11 +51,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ? `https://${tenant.custom_domain}`
       : `https://${tenant.slug}.digitaldisplay.com.br`);
 
-  const ogImage =
+  // Open Graph Image (WhatsApp & Redes Sociais exigem URL absoluta)
+  const rawOgImage =
     seo_config?.og_image_url ||
     content?.hero_image_url ||
     theme?.logo_url ||
-    undefined;
+    "/logo-catuto.svg";
+
+  const ogImageUrl = rawOgImage.startsWith("http")
+    ? rawOgImage
+    : `${canonicalUrl.replace(/\/$/, "")}${rawOgImage.startsWith("/") ? rawOgImage : `/${rawOgImage}`}`;
+
+  // Favicon Dinâmico do Cliente
+  const rawFavicon = theme?.favicon_url || theme?.logo_url || "/logo-catuto.svg";
+  const faviconUrl = rawFavicon.startsWith("http")
+    ? rawFavicon
+    : `${canonicalUrl.replace(/\/$/, "")}${rawFavicon.startsWith("/") ? rawFavicon : `/${rawFavicon}`}`;
 
   return {
     title,
@@ -64,12 +75,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     alternates: {
       canonical: canonicalUrl,
     },
+    icons: {
+      icon: [
+        { url: faviconUrl, sizes: "any" },
+        { url: faviconUrl, type: "image/svg+xml" },
+      ],
+      shortcut: faviconUrl,
+      apple: faviconUrl,
+    },
     openGraph: {
       title,
       description,
       url: canonicalUrl,
       siteName: tenant.name,
-      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: title }] : [],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
       locale: "pt_BR",
       type: "website",
     },
@@ -77,7 +103,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: "summary_large_image",
       title,
       description,
-      images: ogImage ? [ogImage] : [],
+      images: [ogImageUrl],
     },
     robots: {
       index: true,

@@ -2,16 +2,28 @@ import { prisma } from "@/lib/prisma";
 import { getAdminActiveTenant } from "@/lib/admin-tenant";
 import { SettingsTogglesForm } from "@/components/admin/SettingsTogglesForm";
 import { SettingsThemeForm } from "@/components/admin/SettingsThemeForm";
-import { Sliders, Palette } from "lucide-react";
+import { SettingsSeoForm } from "@/components/admin/SettingsSeoForm";
+import { Sliders, Palette, Share2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
-  const tenant = await getAdminActiveTenant();
+  const activeTenant = await getAdminActiveTenant();
+
+  if (!activeTenant) return <div>Empresa não encontrada.</div>;
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: activeTenant.id },
+    include: {
+      settings: true,
+      theme: true,
+      seo_config: true,
+    },
+  });
 
   if (!tenant) return <div>Empresa não encontrada.</div>;
 
-  const { settings, theme } = tenant;
+  const { settings, theme, seo_config } = tenant;
 
   const sectionsList = [
     { key: "show_hero", label: "Seção Hero (Banner Principal)", desc: "Título de impacto, slogan e botões de chamada rápida.", default: settings?.show_hero },
@@ -25,15 +37,19 @@ export default async function AdminSettingsPage() {
     { key: "show_footer", label: "Rodapé Institucional", desc: "Links de navegação, dados cadastrais e copyright.", default: settings?.show_footer },
   ];
 
+  const domainUrl = tenant.custom_domain
+    ? `https://${tenant.custom_domain}`
+    : `https://${tenant.slug}.digitaldisplay.com.br`;
+
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       {/* Section Header */}
       <div>
         <h2 className="text-2xl font-extrabold text-slate-900">
-          Configuração de Seções & Identidade Visual
+          Configuração de Seções, Tema & Compartilhamento
         </h2>
         <p className="text-sm text-slate-500 mt-1">
-          Ative ou desative módulos da página pública e personalize cores e tipografia em tempo real.
+          Ative ou desative módulos da página pública, personalize cores, favicon e configure a prévia do WhatsApp.
         </p>
       </div>
 
@@ -81,15 +97,39 @@ export default async function AdminSettingsPage() {
           </div>
           <div>
             <h3 className="text-lg font-bold text-slate-900">
-              Cores e Identidade Visual (White-Label)
+              Identidade Visual & Favicon (White-Label)
             </h3>
             <p className="text-xs text-slate-500">
-              Ajuste as cores principais e secundárias aplicadas nos botões, fundos e ícones.
+              Ajuste as cores principais, tipografia, logotipo, favicon do navegador e imagem panorâmica de fundo.
             </p>
           </div>
         </div>
 
         <SettingsThemeForm tenantId={tenant.id} theme={theme} />
+      </div>
+
+      {/* 3. SEO & WhatsApp Share Preview */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+        <div className="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+          <div className="p-2 rounded-lg bg-[#25D366] text-white">
+            <Share2 size={20} />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-slate-900">
+              Cartão de Compartilhamento no WhatsApp & SEO (Google)
+            </h3>
+            <p className="text-xs text-slate-500">
+              Personalize a imagem (1200x630), título e descrição que aparecem quando você compartilha o link no WhatsApp, Facebook ou LinkedIn.
+            </p>
+          </div>
+        </div>
+
+        <SettingsSeoForm
+          tenantId={tenant.id}
+          tenantName={tenant.name}
+          domainUrl={domainUrl}
+          seoConfig={seo_config}
+        />
       </div>
     </div>
   );

@@ -69,6 +69,35 @@ export async function updateThemeAction(tenantId: string, themeData: {
   }
 }
 
+// 2.1. Atualizar SEO & Compartilhamento Social (WhatsApp / OpenGraph)
+export async function updateSeoAction(tenantId: string, seoData: {
+  meta_title: string;
+  meta_description: string;
+  keywords?: string[];
+  og_image_url?: string;
+  canonical_url?: string;
+}) {
+  try {
+    await requireAuth();
+
+    await prisma.sEOConfig.upsert({
+      where: { tenant_id: tenantId },
+      update: seoData,
+      create: {
+        tenant_id: tenantId,
+        ...seoData,
+      },
+    });
+
+    revalidatePath("/", "layout");
+    revalidatePath("/admin/settings");
+    return { success: true, message: "SEO e cartão de compartilhamento social atualizados com sucesso!" };
+  } catch (error) {
+    console.error("Erro ao atualizar SEO:", error);
+    return { success: false, message: "Erro ao salvar SEO." };
+  }
+}
+
 // 3. Atualizar Conteúdo & Dados Legais
 export async function updateContentAction(tenantId: string, formData: FormData) {
   try {
