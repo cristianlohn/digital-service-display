@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { updateSectionTogglesAction, updateThemeAction } from "@/app/actions/admin-actions";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 import { Sliders, Palette, CheckCircle2 } from "lucide-react";
 
 export default async function AdminSettingsPage() {
@@ -189,17 +190,25 @@ export default async function AdminSettingsPage() {
               </select>
             </div>
 
-            <div>
-              <label htmlFor="logo_url" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                URL da Logomarca (PNG / SVG)
-              </label>
-              <input
-                type="url"
-                id="logo_url"
+            <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2 border-t border-slate-100">
+              <ImageUpload
                 name="logo_url"
-                defaultValue={theme?.logo_url || ""}
-                placeholder="https://exemplo.com/logo.png"
-                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
+                label="Logomarca da Empresa (Header & Footer)"
+                defaultValue={theme?.logo_url || "/logo-dall.svg"}
+                maxWidth={600}
+                maxHeight={200}
+                quality={0.88}
+                helperText="Upload direto com compactação WebP ou link SVG/PNG."
+              />
+
+              <ImageUpload
+                name="favicon_url"
+                label="Ícone do Navegador (Favicon)"
+                defaultValue={theme?.favicon_url || "/favicon.ico"}
+                maxWidth={128}
+                maxHeight={128}
+                quality={0.85}
+                helperText="Ícone exibido na aba do navegador (128x128)."
               />
             </div>
           </div>

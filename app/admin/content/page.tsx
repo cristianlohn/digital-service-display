@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { updateContentAction } from "@/app/actions/admin-actions";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 import { FileText, CheckCircle2 } from "lucide-react";
 
 export default async function AdminContentPage() {
@@ -90,19 +91,18 @@ export default async function AdminContentPage() {
                   className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
                 />
               </div>
+            </div>
 
-              <div>
-                <label htmlFor="hero_image_url" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  URL da Imagem Hero
-                </label>
-                <input
-                  type="url"
-                  id="hero_image_url"
-                  name="hero_image_url"
-                  defaultValue={content?.hero_image_url || ""}
-                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
-                />
-              </div>
+            <div className="pt-2 border-t border-slate-100">
+              <ImageUpload
+                name="hero_image_url"
+                label="Imagem Principal da Capa (Hero)"
+                defaultValue={content?.hero_image_url || ""}
+                maxWidth={1400}
+                maxHeight={900}
+                quality={0.82}
+                helperText="Imagem em alta definição com conversão automática para WebP."
+              />
             </div>
           </div>
         </div>
@@ -169,16 +169,15 @@ export default async function AdminContentPage() {
               />
             </div>
 
-            <div className="sm:col-span-2">
-              <label htmlFor="about_image_url" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                URL da Imagem da Seção Sobre
-              </label>
-              <input
-                type="url"
-                id="about_image_url"
+            <div className="sm:col-span-2 pt-2 border-t border-slate-100">
+              <ImageUpload
                 name="about_image_url"
+                label="Imagem Institucional (Sobre a Empresa)"
                 defaultValue={content?.about_image_url || ""}
-                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
+                maxWidth={1000}
+                maxHeight={1000}
+                quality={0.82}
+                helperText="Foto da equipe, sede ou projeto com compactação WebP."
               />
             </div>
           </div>

@@ -29,32 +29,34 @@ export function Header({ tenant }: HeaderProps) {
           {/* Logo / Brand Name */}
           <Link href="/" className="flex items-center gap-3 group">
             {theme?.logo_url ? (
-              <div className="relative h-11 w-11 overflow-hidden rounded-lg border border-slate-200 shadow-sm transition-transform group-hover:scale-105">
+              <div className="relative h-12 w-36 sm:w-44 overflow-hidden rounded-lg transition-transform group-hover:scale-105">
                 <Image
                   src={theme.logo_url}
                   alt={tenant.name}
                   fill
-                  className="object-cover"
-                  sizes="44px"
+                  className="object-contain object-left"
+                  sizes="(max-width: 640px) 144px, 176px"
                   priority
                 />
               </div>
             ) : (
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-tenant-primary text-white font-bold shadow-sm">
-                {tenant.name.slice(0, 2).toUpperCase()}
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-tenant-primary text-white font-bold shadow-sm">
+                  {tenant.name.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-lg font-bold tracking-tight text-slate-900 leading-tight">
+                    {tenant.name}
+                  </span>
+                  {content?.professional_register && (
+                    <span className="text-xs font-medium text-slate-500 flex items-center gap-1">
+                      <ShieldCheck size={13} className="text-tenant-secondary" />
+                      {content.professional_register}
+                    </span>
+                  )}
+                </div>
               </div>
             )}
-            <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-tight text-slate-900 leading-tight">
-                {tenant.name}
-              </span>
-              {content?.professional_register && (
-                <span className="text-xs font-medium text-slate-500 flex items-center gap-1">
-                  <ShieldCheck size={13} className="text-tenant-secondary" />
-                  {content.professional_register}
-                </span>
-              )}
-            </div>
           </Link>
 
           {/* Desktop Navigation */}
