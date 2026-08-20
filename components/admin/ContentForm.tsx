@@ -258,17 +258,21 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
 
             <div>
               <label htmlFor="founded_year" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Ano de Fundação
+                Ano de Fundação (Opcional)
               </label>
               <input
                 type="number"
                 id="founded_year"
                 name="founded_year"
-                defaultValue={content?.founded_year || 2024}
+                defaultValue={content?.founded_year || ""}
                 min={1900}
                 max={2100}
+                placeholder="Ex: 2020 (ou deixe em branco)"
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
+              <p className="text-[11px] text-slate-400 mt-1">
+                Deixe em branco caso a empresa seja recém-criada.
+              </p>
             </div>
 
             <div className="sm:col-span-2">

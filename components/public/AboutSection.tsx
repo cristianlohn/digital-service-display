@@ -12,7 +12,8 @@ export function AboutSection({ tenant }: AboutSectionProps) {
   if (!content) return null;
 
   const currentYear = new Date().getFullYear();
-  const yearsActive = content.founded_year ? currentYear - content.founded_year : 5;
+  const yearsActive = content.founded_year ? currentYear - content.founded_year : 0;
+  const showExperiencePill = content.founded_year && yearsActive >= 1;
 
   return (
     <section id="sobre" className="py-20 sm:py-28 bg-white relative">
@@ -36,15 +37,15 @@ export function AboutSection({ tenant }: AboutSectionProps) {
               )}
             </div>
 
-            {/* Experience Pill */}
-            {content.founded_year && (
+            {/* Experience Pill - Exibido apenas se a empresa tiver 1 ano ou mais */}
+            {showExperiencePill && (
               <div className="absolute -bottom-6 -right-6 sm:bottom-6 sm:-right-8 rounded-xl bg-slate-900 text-white p-6 shadow-2xl border border-slate-800 flex items-center gap-4">
                 <div className="p-3 rounded-lg bg-tenant-secondary/20 text-tenant-secondary">
                   <Clock size={28} />
                 </div>
                 <div>
                   <div className="text-3xl font-extrabold tracking-tight text-white">
-                    +{yearsActive} Anos
+                    +{yearsActive} {yearsActive === 1 ? "Ano" : "Anos"}
                   </div>
                   <div className="text-xs text-slate-400 font-medium">
                     De experiência e inovação

@@ -66,7 +66,7 @@ export async function seedCatuto() {
           about_badge_text: "Quem Somos",
           about_title: "CATUTO Soluções Digitais: Sua Base no Digital",
           about_description: "A CATUTO é uma pequena empresa focada em transformar a presença digital de empreendedores e pequenas empresas. Nós criamos websites profissionais, modernos e de alta performance que servem como a base sólida para o crescimento do seu negócio online, permitindo que você navegue com segurança e eficiência no mercado digital turbulento.",
-          founded_year: 2024,
+          founded_year: null,
           about_image_url: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1000&auto=format&fit=crop&q=80",
 
           mission_text: "Criar websites profissionais e funcionais que funcionem como ativos de crescimento e autoridade para nossos clientes no digital.",
