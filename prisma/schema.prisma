@@ -88,6 +88,8 @@ model TenantSettings {
   show_contact_form Boolean  @default(true)
   show_map          Boolean  @default(true)
   show_footer       Boolean  @default(true)
+  show_cnpj         Boolean  @default(true)
+  show_address      Boolean  @default(true)
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
 
@@ -124,13 +126,13 @@ model TenantContent {
   phone                 String?
   whatsapp_number       String   // Digits only with country/area code (ex: 5547997521721)
   email                 String
-  address_street        String
-  address_number        String
-  address_neighborhood  String
-  address_city          String
-  address_state         String   // UF (ex: SC)
-  address_zip           String   // CEP (ex: 89228-000)
-  cnpj                  String
+  address_street        String?
+  address_number        String?
+  address_neighborhood  String?
+  address_city          String?
+  address_state         String?  // UF (ex: SC)
+  address_zip           String?  // CEP (ex: 89228-000)
+  cnpj                  String?  // Opcional
   professional_register String?  // ex: CREA-SC 223232-2, CRM, OAB
   google_maps_url       String?  @db.Text
   working_hours         String?  @default("Segunda a Sexta: 08h às 18h")

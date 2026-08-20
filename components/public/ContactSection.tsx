@@ -122,20 +122,28 @@ export function ContactSection({ tenant }: ContactSectionProps) {
                   </div>
                 </a>
 
-                <div className="flex items-start gap-3.5 text-slate-300">
-                  <div className="p-2 rounded-lg bg-white/10 text-tenant-secondary flex-shrink-0">
-                    <MapPin size={18} />
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 font-medium">Endereço Sede</div>
-                    <div className="font-semibold text-white">
-                      {content.address_street}, {content.address_number} - {content.address_neighborhood}
+                {(content.address_street || content.address_city) && (
+                  <div className="flex items-start gap-3.5 text-slate-300">
+                    <div className="p-2 rounded-lg bg-white/10 text-tenant-secondary flex-shrink-0">
+                      <MapPin size={18} />
                     </div>
-                    <div className="text-xs text-slate-400">
-                      {content.address_city} - {content.address_state} | CEP: {content.address_zip}
+                    <div>
+                      <div className="text-xs text-slate-400 font-medium">Localização / Atendimento</div>
+                      <div className="font-semibold text-white">
+                        {content.address_street}
+                        {content.address_number ? `, ${content.address_number}` : ""}
+                        {content.address_neighborhood ? ` - ${content.address_neighborhood}` : ""}
+                      </div>
+                      {content.address_city && (
+                        <div className="text-xs text-slate-400">
+                          {content.address_city}
+                          {content.address_state ? ` - ${content.address_state}` : ""}
+                          {content.address_zip ? ` | CEP: ${content.address_zip}` : ""}
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
 
                 {content.working_hours && (
                   <div className="flex items-start gap-3.5 text-slate-300">

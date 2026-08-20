@@ -152,14 +152,20 @@ export function Footer({ tenant }: FooterProps) {
             </h4>
             {content && (
               <div className="space-y-2 text-slate-400">
-                <div className="flex items-start gap-2">
-                  <MapPin size={14} className="text-slate-500 mt-0.5 flex-shrink-0" />
-                  <span>
-                    {content.address_street}, {content.address_number} - {content.address_neighborhood}
-                    <br />
-                    {content.address_city} - {content.address_state} | CEP {content.address_zip}
-                  </span>
-                </div>
+                {(content.address_street || content.address_city) && (
+                  <div className="flex items-start gap-2">
+                    <MapPin size={14} className="text-slate-500 mt-0.5 flex-shrink-0" />
+                    <span>
+                      {content.address_street ? `${content.address_street}${content.address_number ? `, ${content.address_number}` : ""}${content.address_neighborhood ? ` - ${content.address_neighborhood}` : ""}` : ""}
+                      {content.address_city ? (
+                        <>
+                          <br />
+                          {content.address_city}{content.address_state ? ` - ${content.address_state}` : ""}{content.address_zip ? ` | CEP ${content.address_zip}` : ""}
+                        </>
+                      ) : null}
+                    </span>
+                  </div>
+                )}
 
                 {content.phone && (
                   <div className="flex items-center gap-2">
@@ -173,9 +179,11 @@ export function Footer({ tenant }: FooterProps) {
                   <span className="break-all">{content.email}</span>
                 </div>
 
-                <div className="pt-2 text-[11px] text-slate-500">
-                  CNPJ: {formatCNPJ(content.cnpj)}
-                </div>
+                {content.cnpj && (
+                  <div className="pt-2 text-[11px] text-slate-500">
+                    CNPJ: {formatCNPJ(content.cnpj)}
+                  </div>
+                )}
               </div>
             )}
           </div>

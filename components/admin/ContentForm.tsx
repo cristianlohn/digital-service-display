@@ -5,7 +5,25 @@ import { updateContentAction } from "@/app/actions/admin-actions";
 import { ImageUpload } from "./ImageUpload";
 import { SubmitButton } from "./SubmitButton";
 import { FeedbackToast } from "./FeedbackToast";
-import { FileText, Phone, MapPin, CheckCircle2, Share2, Sparkles, HelpCircle } from "lucide-react";
+import {
+  maskCNPJ,
+  isValidCNPJ,
+  maskPhone,
+  isValidPhone,
+  maskCEP,
+  maskUF,
+  cleanDigits,
+} from "@/lib/masks";
+import {
+  FileText,
+  Phone,
+  MapPin,
+  CheckCircle2,
+  Share2,
+  Sparkles,
+  AlertCircle,
+  ShieldCheck,
+} from "lucide-react";
 
 interface ContentFormProps {
   tenantId: string;
@@ -26,15 +44,15 @@ interface ContentFormProps {
     phone?: string | null;
     whatsapp_number: string;
     email: string;
-    cnpj: string;
+    cnpj?: string | null;
     professional_register?: string | null;
     working_hours?: string | null;
-    address_street: string;
-    address_number: string;
-    address_neighborhood: string;
-    address_city: string;
-    address_state: string;
-    address_zip: string;
+    address_street?: string | null;
+    address_number?: string | null;
+    address_neighborhood?: string | null;
+    address_city?: string | null;
+    address_state?: string | null;
+    address_zip?: string | null;
     instagram_url?: string | null;
     linkedin_url?: string | null;
     facebook_url?: string | null;
@@ -43,13 +61,56 @@ interface ContentFormProps {
 }
 
 export function ContentForm({ tenantId, content }: ContentFormProps) {
+  // Controlled fields with dynamic masks
+  const [whatsapp, setWhatsapp] = useState(
+    content?.whatsapp_number ? maskPhone(content.whatsapp_number) : ""
+  );
+  const [phone, setPhone] = useState(
+    content?.phone ? maskPhone(content.phone) : ""
+  );
+  const [cnpj, setCnpj] = useState(
+    content?.cnpj ? maskCNPJ(content.cnpj) : ""
+  );
+  const [cep, setCep] = useState(
+    content?.address_zip ? maskCEP(content.address_zip) : ""
+  );
+  const [uf, setUf] = useState(
+    content?.address_state ? maskUF(content.address_state) : ""
+  );
+
   const [feedback, setFeedback] = useState<{
     status: "success" | "error" | null;
     message: string | null;
   }>({ status: null, message: null });
 
+  // Validations
+  const cnpjDigits = cleanDigits(cnpj);
+  const isCnpjValid = cnpjDigits.length === 0 || isValidCNPJ(cnpj);
+  const isWhatsappValid = isValidPhone(whatsapp);
+
   async function handleSubmit(formData: FormData) {
     setFeedback({ status: null, message: null });
+
+    // Validate CNPJ if filled
+    if (cnpjDigits.length > 0 && !isValidCNPJ(cnpj)) {
+      setFeedback({
+        status: "error",
+        message: "O CNPJ informado é inválido. Corrija ou deixe em branco caso não possua.",
+      });
+      return;
+    }
+
+    // Format WhatsApp with country code (55)
+    const rawWhatsappDigits = cleanDigits(whatsapp);
+    const finalWhatsapp = rawWhatsappDigits.startsWith("55")
+      ? rawWhatsappDigits
+      : `55${rawWhatsappDigits}`;
+
+    formData.set("whatsapp_number", finalWhatsapp);
+    formData.set("cnpj", cnpj.trim());
+    formData.set("phone", phone.trim());
+    formData.set("address_zip", cep.trim());
+    formData.set("address_state", uf.trim().toUpperCase());
 
     const result = await updateContentAction(tenantId, formData);
 
@@ -107,6 +168,8 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                 name="hero_title"
                 defaultValue={content?.hero_title}
                 required
+                maxLength={100}
+                placeholder="Ex: Sua estrutura sólida no digital"
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
@@ -121,6 +184,8 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                 rows={2}
                 defaultValue={content?.hero_subtitle}
                 required
+                maxLength={250}
+                placeholder="Apresente sua proposta de valor em 1 ou 2 frases..."
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
@@ -135,6 +200,7 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                   id="cta_primary_text"
                   name="cta_primary_text"
                   defaultValue={content?.cta_primary_text || "Solicitar Orçamento"}
+                  maxLength={40}
                   className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
                 />
               </div>
@@ -148,6 +214,7 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                   id="cta_whatsapp_text"
                   name="cta_whatsapp_text"
                   defaultValue={content?.cta_whatsapp_text || "Falar no WhatsApp"}
+                  maxLength={40}
                   className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
                 />
               </div>
@@ -184,6 +251,7 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                 id="about_badge_text"
                 name="about_badge_text"
                 defaultValue={content?.about_badge_text || "Quem Somos"}
+                maxLength={40}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
@@ -197,6 +265,8 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                 id="founded_year"
                 name="founded_year"
                 defaultValue={content?.founded_year || 2024}
+                min={1900}
+                max={2100}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
@@ -211,6 +281,7 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                 name="about_title"
                 defaultValue={content?.about_title}
                 required
+                maxLength={100}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
@@ -225,6 +296,7 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                 rows={4}
                 defaultValue={content?.about_description}
                 required
+                maxLength={1000}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
@@ -260,6 +332,7 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                 name="mission_text"
                 rows={3}
                 defaultValue={content?.mission_text || ""}
+                maxLength={300}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
@@ -273,6 +346,7 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                 name="vision_text"
                 rows={3}
                 defaultValue={content?.vision_text || ""}
+                maxLength={300}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
@@ -301,35 +375,49 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {/* WhatsApp */}
             <div>
-              <label htmlFor="whatsapp_number" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                WhatsApp Comercial (Apenas números com DDI/DDD) *
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="whatsapp_number" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  WhatsApp Comercial *
+                </label>
+                {whatsapp && (
+                  <span className={`text-[10px] font-bold ${isWhatsappValid ? "text-emerald-600" : "text-amber-600"}`}>
+                    {isWhatsappValid ? "Válido" : "Incompleto"}
+                  </span>
+                )}
+              </div>
               <input
                 type="text"
                 id="whatsapp_number"
                 name="whatsapp_number"
-                defaultValue={content?.whatsapp_number}
-                placeholder="5547996348698"
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(maskPhone(e.target.value))}
+                placeholder="(47) 99634-8698"
                 required
+                maxLength={15}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-mono"
               />
             </div>
 
+            {/* Telefone Fixo */}
             <div>
               <label htmlFor="phone" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Telefone Fixo / Adicional
+                Telefone Fixo / Secundário (Opcional)
               </label>
               <input
                 type="text"
                 id="phone"
                 name="phone"
-                defaultValue={content?.phone || ""}
+                value={phone}
+                onChange={(e) => setPhone(maskPhone(e.target.value))}
                 placeholder="(47) 3333-3333"
-                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
+                maxLength={15}
+                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-mono"
               />
             </div>
 
+            {/* E-mail */}
             <div>
               <label htmlFor="email" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 E-mail Corporativo *
@@ -340,24 +428,44 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                 name="email"
                 defaultValue={content?.email}
                 required
+                maxLength={80}
+                placeholder="contato@empresa.com.br"
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
 
+            {/* CNPJ (Opcional com validação inteligente) */}
             <div>
-              <label htmlFor="cnpj" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                CNPJ *
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="cnpj" className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  CNPJ (Opcional)
+                </label>
+                {cnpjDigits.length > 0 && (
+                  <span className={`text-[10px] font-bold ${isCnpjValid ? "text-emerald-600" : "text-rose-600"}`}>
+                    {isCnpjValid ? "CNPJ Válido" : "Inválido"}
+                  </span>
+                )}
+              </div>
               <input
                 type="text"
                 id="cnpj"
                 name="cnpj"
-                defaultValue={content?.cnpj}
-                required
-                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
+                value={cnpj}
+                onChange={(e) => setCnpj(maskCNPJ(e.target.value))}
+                placeholder="00.000.000/0000-00"
+                maxLength={18}
+                className={`w-full rounded-xl border px-4 py-2.5 text-sm font-mono ${
+                  cnpjDigits.length > 0 && !isCnpjValid
+                    ? "border-rose-400 focus:ring-rose-400 bg-rose-50/30"
+                    : "border-slate-300"
+                }`}
               />
+              <p className="text-[11px] text-slate-400 mt-1">
+                Deixe em branco caso a empresa não possua ou não queira exibir.
+              </p>
             </div>
 
+            {/* Registro Profissional */}
             <div>
               <label htmlFor="professional_register" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 Registro Técnico / Especialidade
@@ -367,11 +475,13 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                 id="professional_register"
                 name="professional_register"
                 defaultValue={content?.professional_register || ""}
-                placeholder="CREA-SC 223232-2 ou Soluções Web"
+                placeholder="CREA-SC, OAB, Soluções Web"
+                maxLength={50}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
 
+            {/* Horário de Atendimento */}
             <div>
               <label htmlFor="working_hours" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 Horário de Atendimento
@@ -382,93 +492,106 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
                 name="working_hours"
                 defaultValue={content?.working_hours || ""}
                 placeholder="Segunda a Sexta: 08h às 18h"
+                maxLength={70}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
 
+            {/* Endereço: Rua */}
             <div className="sm:col-span-2">
               <label htmlFor="address_street" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Logradouro / Rua *
+                Logradouro / Rua (Opcional se 100% Online)
               </label>
               <input
                 type="text"
                 id="address_street"
                 name="address_street"
-                defaultValue={content?.address_street}
-                required
+                defaultValue={content?.address_street || ""}
+                placeholder="Rua dos Caruaras ou Atendimento 100% Online"
+                maxLength={100}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
 
+            {/* Número */}
             <div>
               <label htmlFor="address_number" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Número *
+                Número
               </label>
               <input
                 type="text"
                 id="address_number"
                 name="address_number"
-                defaultValue={content?.address_number}
-                required
+                defaultValue={content?.address_number || ""}
+                placeholder="479 ou S/N"
+                maxLength={20}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
 
+            {/* Bairro */}
             <div>
               <label htmlFor="address_neighborhood" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Bairro *
+                Bairro
               </label>
               <input
                 type="text"
                 id="address_neighborhood"
                 name="address_neighborhood"
-                defaultValue={content?.address_neighborhood}
-                required
+                defaultValue={content?.address_neighborhood || ""}
+                placeholder="Centro, Comasa..."
+                maxLength={50}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
 
+            {/* Cidade */}
             <div>
               <label htmlFor="address_city" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Cidade *
+                Cidade
               </label>
               <input
                 type="text"
                 id="address_city"
                 name="address_city"
-                defaultValue={content?.address_city}
-                required
+                defaultValue={content?.address_city || ""}
+                placeholder="Joinville"
+                maxLength={50}
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
 
+            {/* UF */}
             <div>
               <label htmlFor="address_state" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                UF / Estado *
+                UF / Estado (2 Letras)
               </label>
               <input
                 type="text"
                 id="address_state"
                 name="address_state"
-                defaultValue={content?.address_state}
-                required
+                value={uf}
+                onChange={(e) => setUf(maskUF(e.target.value))}
+                placeholder="SC"
                 maxLength={2}
-                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm uppercase"
+                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm uppercase font-mono"
               />
             </div>
 
+            {/* CEP */}
             <div>
               <label htmlFor="address_zip" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                CEP *
+                CEP (Opcional)
               </label>
               <input
                 type="text"
                 id="address_zip"
                 name="address_zip"
-                defaultValue={content?.address_zip}
-                required
+                value={cep}
+                onChange={(e) => setCep(maskCEP(e.target.value))}
                 placeholder="89228-000"
-                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
+                maxLength={9}
+                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-mono"
               />
             </div>
           </div>
@@ -478,10 +601,10 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
         <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-5">
           <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
             <Share2 size={18} className="text-tenant-secondary" />
-            <span>5. Redes Sociais Oficiais</span>
+            <span>5. Redes Sociais Oficiais (Opcionais)</span>
           </h3>
           <p className="text-xs text-slate-500">
-            Informe as URLs completas dos perfis da empresa. Os ícones serão exibidos no cabeçalho, rodapé e bloco de contato.
+            Informe as URLs completas dos perfis da empresa. Os ícones só serão exibidos no site caso o link seja preenchido.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -545,7 +668,7 @@ export function ContentForm({ tenantId, content }: ContentFormProps) {
 
         <div className="flex items-center justify-between pt-4 border-t border-slate-200">
           <div className="text-xs text-slate-500">
-            Todas as alterações são gravadas instantaneamente no banco de dados.
+            Campos opcionais em branco são automaticamente ocultados no site público.
           </div>
           <SubmitButton
             label="Salvar Todas as Alterações de Conteúdo"

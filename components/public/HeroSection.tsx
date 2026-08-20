@@ -46,7 +46,8 @@ export function HeroSection({ tenant }: HeroSectionProps) {
               <div className="inline-flex items-center justify-center lg:justify-start">
                 <span className="inline-flex items-center gap-2 rounded-full bg-slate-900/5 px-4 py-1.5 text-xs font-semibold text-slate-800 border border-slate-200/80 shadow-sm">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                  {content.professional_register} | {content.address_city} - {content.address_state}
+                  {content.professional_register}
+                  {content.address_city ? ` | ${content.address_city}${content.address_state ? ` - ${content.address_state}` : ""}` : ""}
                 </span>
               </div>
             )}
