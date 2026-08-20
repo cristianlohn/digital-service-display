@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { LeadStatus } from "@prisma/client";
+import { requireAuth } from "@/lib/auth";
 
 // 1. Atualizar Toggles de Seções
 export async function updateSectionTogglesAction(tenantId: string, settingsData: {
@@ -18,6 +19,8 @@ export async function updateSectionTogglesAction(tenantId: string, settingsData:
   show_footer?: boolean;
 }) {
   try {
+    await requireAuth();
+
     await prisma.tenantSettings.upsert({
       where: { tenant_id: tenantId },
       update: settingsData,
@@ -45,6 +48,8 @@ export async function updateThemeAction(tenantId: string, themeData: {
   dark_mode_enabled?: boolean;
 }) {
   try {
+    await requireAuth();
+
     await prisma.tenantTheme.upsert({
       where: { tenant_id: tenantId },
       update: themeData,
@@ -65,6 +70,8 @@ export async function updateThemeAction(tenantId: string, themeData: {
 // 3. Atualizar Conteúdo & Dados Legais
 export async function updateContentAction(tenantId: string, formData: FormData) {
   try {
+    await requireAuth();
+
     const valuesString = (formData.get("values") as string) || "";
     const valuesArray = valuesString
       .split("\n")
@@ -126,6 +133,8 @@ export async function updateContentAction(tenantId: string, formData: FormData) 
 // 4. CRUD de Serviços
 export async function createServiceAction(tenantId: string, formData: FormData) {
   try {
+    await requireAuth();
+
     const title = formData.get("title") as string;
     const short_description = formData.get("short_description") as string;
     const full_description = (formData.get("full_description") as string) || null;
@@ -156,6 +165,8 @@ export async function createServiceAction(tenantId: string, formData: FormData) 
 
 export async function deleteServiceAction(serviceId: string) {
   try {
+    await requireAuth();
+
     await prisma.service.delete({
       where: { id: serviceId },
     });
@@ -172,6 +183,8 @@ export async function deleteServiceAction(serviceId: string) {
 // 5. Atualizar Status do Lead
 export async function updateLeadStatusAction(leadId: string, status: LeadStatus) {
   try {
+    await requireAuth();
+
     await prisma.lead.update({
       where: { id: leadId },
       data: { status },

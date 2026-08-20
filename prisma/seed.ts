@@ -1,5 +1,6 @@
 import { PrismaClient, TenantStatus } from "@prisma/client";
 import { seedCatuto } from "./seed-catuto";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -263,6 +264,69 @@ async function main() {
 
   // Seed do tenant Catuto Soluções Digitais
   await seedCatuto();
+
+  // Seed de Usuários Administrativos
+  console.log("🔐 Criando usuários administrativos de segurança...");
+  const catutoTenant = await prisma.tenant.findUnique({ where: { slug: "catuto" } });
+  const dallTenant = await prisma.tenant.findUnique({ where: { slug: "dall-automacao" } });
+
+  const salt = await bcrypt.genSalt(10);
+
+  // 1. Super Admin Geral da Plataforma
+  await prisma.adminUser.upsert({
+    where: { email: "admin@catuto.com.br" },
+    update: {
+      name: "Administrador Geral",
+      password_hash: await bcrypt.hash("Admin@123456", salt),
+      role: "SUPER_ADMIN",
+      tenant_id: catutoTenant?.id || null,
+    },
+    create: {
+      name: "Administrador Geral",
+      email: "admin@catuto.com.br",
+      password_hash: await bcrypt.hash("Admin@123456", salt),
+      role: "SUPER_ADMIN",
+      tenant_id: catutoTenant?.id || null,
+    },
+  });
+
+  // 2. Gestor Catuto Soluções Digitais
+  await prisma.adminUser.upsert({
+    where: { email: "cristian@catuto.com.br" },
+    update: {
+      name: "Cristian - Catuto",
+      password_hash: await bcrypt.hash("Catuto@2024", salt),
+      role: "TENANT_ADMIN",
+      tenant_id: catutoTenant?.id || null,
+    },
+    create: {
+      name: "Cristian - Catuto",
+      email: "cristian@catuto.com.br",
+      password_hash: await bcrypt.hash("Catuto@2024", salt),
+      role: "TENANT_ADMIN",
+      tenant_id: catutoTenant?.id || null,
+    },
+  });
+
+  // 3. Gestor D'All Automação
+  await prisma.adminUser.upsert({
+    where: { email: "contato@dallautomacao.com.br" },
+    update: {
+      name: "Gestor D'All",
+      password_hash: await bcrypt.hash("Dall@2024", salt),
+      role: "TENANT_ADMIN",
+      tenant_id: dallTenant?.id || null,
+    },
+    create: {
+      name: "Gestor D'All",
+      email: "contato@dallautomacao.com.br",
+      password_hash: await bcrypt.hash("Dall@2024", salt),
+      role: "TENANT_ADMIN",
+      tenant_id: dallTenant?.id || null,
+    },
+  });
+
+  console.log("✅ Usuários administrativos configurados com sucesso!");
 }
 
 main()

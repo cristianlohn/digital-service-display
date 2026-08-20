@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AUTH_COOKIE_NAME, verifySessionToken } from "@/lib/jwt";
 
 export const config = {
   matcher: [
@@ -19,12 +20,47 @@ export default async function middleware(req: NextRequest) {
   const path = url.pathname;
   const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000";
 
-  // Se for rota administrativa (/admin) ou api, mantém sem reescrita
+  // ==========================================
+  // 1. SEGURANÇA & AUTENTICAÇÃO DO ADMIN
+  // ==========================================
   if (path.startsWith("/admin") || path.startsWith("/api/admin")) {
-    return NextResponse.next();
+    const sessionToken = req.cookies.get(AUTH_COOKIE_NAME)?.value;
+    const session = sessionToken ? await verifySessionToken(sessionToken) : null;
+
+    // Rota pública de login
+    if (path === "/admin/login") {
+      if (session) {
+        // Já está autenticado -> redireciona para o dashboard
+        return NextResponse.redirect(new URL("/admin", req.url));
+      }
+      return NextResponse.next();
+    }
+
+    // Todas as outras rotas /admin exigem autenticação
+    if (!session) {
+      const loginUrl = new URL("/admin/login", req.url);
+      loginUrl.searchParams.set("redirect", path);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Usuário autenticado -> prossegue
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set("x-user-id", session.userId);
+    requestHeaders.set("x-user-role", session.role);
+    if (session.tenantId) {
+      requestHeaders.set("x-user-tenant", session.tenantId);
+    }
+
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
   }
 
-  // Remove porta e remove prefixo www. para normalização
+  // ==========================================
+  // 2. ROTEAMENTO MULTITENANT (PÁGINAS PÚBLICAS)
+  // ==========================================
   const cleanHost = hostname.replace(`:${url.port}`, "").toLowerCase();
   const currentHost = cleanHost.replace(/^www\./, "");
 

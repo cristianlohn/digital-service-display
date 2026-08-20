@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+import { LogoutButton } from "@/components/admin/LogoutButton";
 import {
   LayoutDashboard,
   FileText,
@@ -8,6 +10,7 @@ import {
   Users,
   ExternalLink,
   Shield,
+  UserCheck,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -17,12 +20,28 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const user = await getCurrentUser();
+
+  // Se não estiver autenticado (ex: na tela /admin/login), renderiza sem sidebar
+  if (!user) {
+    return <div className="min-h-screen bg-slate-950">{children}</div>;
+  }
+
   let tenant = null;
 
   try {
-    tenant = await prisma.tenant.findFirst({
-      include: { theme: true },
-    });
+    if (user.tenantId) {
+      tenant = await prisma.tenant.findUnique({
+        where: { id: user.tenantId },
+        include: { theme: true },
+      });
+    }
+
+    if (!tenant) {
+      tenant = await prisma.tenant.findFirst({
+        include: { theme: true },
+      });
+    }
   } catch (error) {
     console.error("Erro ao buscar tenant no admin layout:", error);
   }
@@ -42,7 +61,7 @@ export default async function AdminLayout({
                 Painel White-Label
               </h1>
               <p className="text-xs text-slate-400 truncate max-w-[140px]">
-                {tenant?.name || "Empresa Ativa"}
+                {tenant?.name || "Plataforma SaaS"}
               </p>
             </div>
           </div>
@@ -91,17 +110,34 @@ export default async function AdminLayout({
           </nav>
         </div>
 
-        {/* Bottom Actions: View Public Page */}
-        <div className="p-4 border-t border-slate-800">
+        {/* User Profile & Logout Bottom Section */}
+        <div className="p-4 border-t border-slate-800 space-y-3">
+          {/* User Info Card */}
+          <div className="flex items-center gap-3 px-2 py-1.5 rounded-xl bg-slate-950/40 border border-slate-800/80">
+            <div className="h-8 w-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-xs font-bold text-white truncate">
+                {user.name}
+              </div>
+              <div className="text-[10px] text-slate-400 truncate">
+                {user.role === "SUPER_ADMIN" ? "Super Admin" : "Gestor"} • {user.email}
+              </div>
+            </div>
+          </div>
+
           <a
-            href="/"
+            href={tenant?.custom_domain ? `https://${tenant.custom_domain}` : `/${tenant?.slug || ""}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition-colors"
           >
             <span>Ver Site Público</span>
-            <ExternalLink size={14} />
+            <ExternalLink size={13} />
           </a>
+
+          <LogoutButton />
         </div>
       </aside>
 
@@ -109,9 +145,9 @@ export default async function AdminLayout({
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2 text-sm text-slate-600">
-            <span className="font-semibold text-slate-900">Tenant:</span>
+            <span className="font-semibold text-slate-900">Empresa Ativa:</span>
             <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-xs font-bold text-slate-700">
-              {tenant?.slug || "dall-automacao"}
+              {tenant?.name || "Catuto Soluções Digitais"}
             </span>
             {tenant?.custom_domain && (
               <span className="text-xs text-slate-400">
@@ -121,8 +157,10 @@ export default async function AdminLayout({
           </div>
 
           <div className="flex items-center gap-3 text-xs text-slate-500">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-            <span>Modo de Produção / Vercel Edge</span>
+            <span className="inline-flex items-center gap-1.5 text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Sessão Segura</span>
+            </span>
           </div>
         </header>
 

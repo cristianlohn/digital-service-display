@@ -24,6 +24,11 @@ enum LeadStatus {
   ARCHIVED
 }
 
+enum AdminRole {
+  SUPER_ADMIN
+  TENANT_ADMIN
+}
+
 model Tenant {
   id            String       @id @default(cuid())
   slug          String       @unique
@@ -46,6 +51,7 @@ model Tenant {
   faqs         FAQ[]
   testimonials Testimonial[]
   leads        Lead[]
+  admin_users  AdminUser[]
 
   @@index([slug])
   @@index([custom_domain])
@@ -262,4 +268,21 @@ model Lead {
   @@index([tenant_id])
   @@index([status])
   @@map("leads")
+}
+
+model AdminUser {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password_hash String
+  role          AdminRole @default(TENANT_ADMIN)
+  tenant_id     String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  tenant Tenant? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@index([tenant_id])
+  @@index([email])
+  @@map("admin_users")
 }
