@@ -57,51 +57,17 @@ export async function getTenantByDomainOrSlug(
     }
   }
 
-  // 1. Tenta buscar por Custom Domain ou Slug
-  let tenant = await prisma.tenant.findFirst({
-    where: {
-      OR: [
-        { custom_domain: cleanIdentifier },
-        { slug: slugOrDomain },
-        { slug: cleanIdentifier },
-      ],
-      status: "ACTIVE",
-    },
-    include: {
-      theme: true,
-      settings: true,
-      content: true,
-      seo_config: true,
-      badges: {
-        orderBy: { order: "asc" },
+  try {
+    // 1. Tenta buscar por Custom Domain ou Slug
+    let tenant = await prisma.tenant.findFirst({
+      where: {
+        OR: [
+          { custom_domain: cleanIdentifier },
+          { slug: slugOrDomain },
+          { slug: cleanIdentifier },
+        ],
+        status: "ACTIVE",
       },
-      categories: {
-        orderBy: { order: "asc" },
-        include: {
-          services: {
-            orderBy: { order: "asc" },
-          },
-        },
-      },
-      services: {
-        orderBy: { order: "asc" },
-        include: {
-          category: true,
-        },
-      },
-      faqs: {
-        orderBy: { order: "asc" },
-      },
-      testimonials: {
-        orderBy: { order: "asc" },
-      },
-    },
-  });
-
-  // 2. Fallback de segurança para demonstração em URLs temporárias (ex: Vercel Preview)
-  if (!tenant) {
-    tenant = await prisma.tenant.findFirst({
-      where: { status: "ACTIVE" },
       include: {
         theme: true,
         settings: true,
@@ -132,9 +98,48 @@ export async function getTenantByDomainOrSlug(
         },
       },
     });
-  }
 
-  return tenant;
+    // 2. Fallback de segurança para demonstração em URLs temporárias (ex: Vercel Preview)
+    if (!tenant) {
+      tenant = await prisma.tenant.findFirst({
+        where: { status: "ACTIVE" },
+        include: {
+          theme: true,
+          settings: true,
+          content: true,
+          seo_config: true,
+          badges: {
+            orderBy: { order: "asc" },
+          },
+          categories: {
+            orderBy: { order: "asc" },
+            include: {
+              services: {
+                orderBy: { order: "asc" },
+              },
+            },
+          },
+          services: {
+            orderBy: { order: "asc" },
+            include: {
+              category: true,
+            },
+          },
+          faqs: {
+            orderBy: { order: "asc" },
+          },
+          testimonials: {
+            orderBy: { order: "asc" },
+          },
+        },
+      });
+    }
+
+    return tenant;
+  } catch (error) {
+    console.error("Erro ao buscar dados do tenant no banco de dados:", error);
+    return null;
+  }
 }
 
 export async function getAllActiveTenants() {
