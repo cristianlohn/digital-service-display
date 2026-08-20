@@ -1,0 +1,259 @@
+// Prisma Schema for White-Label Multitenant Service Display Platform
+// Database: PostgreSQL (Supabase Compatible)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum TenantStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  ARCHIVED
+}
+
+model Tenant {
+  id            String       @id @default(cuid())
+  slug          String       @unique
+  name          String
+  custom_domain String?      @unique
+  status        TenantStatus @default(ACTIVE)
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+
+  // 1-to-1 relations
+  theme       TenantTheme?
+  settings    TenantSettings?
+  content     TenantContent?
+  seo_config  SEOConfig?
+
+  // 1-to-many relations
+  categories   ServiceCategory[]
+  services     Service[]
+  badges       Badge[]
+  faqs         FAQ[]
+  testimonials Testimonial[]
+  leads        Lead[]
+
+  @@index([slug])
+  @@index([custom_domain])
+  @@map("tenants")
+}
+
+model TenantTheme {
+  id                String   @id @default(cuid())
+  tenant_id         String   @unique
+  primary_color     String   @default("#0f172a") // Hex code
+  secondary_color   String   @default("#f59e0b") // Hex code
+  font_family       String   @default("Inter")   // Inter, Roboto, Outfit, etc.
+  logo_url          String?
+  favicon_url       String?
+  dark_mode_enabled Boolean  @default(false)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@map("tenant_themes")
+}
+
+model TenantSettings {
+  id                String   @id @default(cuid())
+  tenant_id         String   @unique
+  show_hero         Boolean  @default(true)
+  show_about        Boolean  @default(true)
+  show_mission      Boolean  @default(true)
+  show_services     Boolean  @default(true)
+  show_badges       Boolean  @default(true)
+  show_faq          Boolean  @default(true)
+  show_testimonials Boolean  @default(true)
+  show_contact_form Boolean  @default(true)
+  show_map          Boolean  @default(true)
+  show_footer       Boolean  @default(true)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@map("tenant_settings")
+}
+
+model TenantContent {
+  id                    String   @id @default(cuid())
+  tenant_id             String   @unique
+  
+  // Hero Section
+  hero_title            String
+  hero_subtitle         String
+  cta_primary_text      String   @default("Solicitar Orçamento")
+  cta_primary_link      String   @default("#contato")
+  cta_whatsapp_text     String   @default("Falar no WhatsApp")
+  hero_image_url        String?
+
+  // About Section
+  about_badge_text      String?  @default("Quem Somos")
+  about_title           String
+  about_description     String   @db.Text
+  founded_year          Int?
+  about_image_url       String?
+
+  // Mission, Vision & Values
+  mission_text          String?  @db.Text
+  vision_text           String?  @db.Text
+  values                String[] @default([])
+
+  // Contact & Legal
+  phone                 String?
+  whatsapp_number       String   // Digits only with country/area code (ex: 5547997521721)
+  email                 String
+  address_street        String
+  address_number        String
+  address_neighborhood  String
+  address_city          String
+  address_state         String   // UF (ex: SC)
+  address_zip           String   // CEP (ex: 89228-000)
+  cnpj                  String
+  professional_register String?  // ex: CREA-SC 223232-2, CRM, OAB
+  google_maps_url       String?  @db.Text
+  working_hours         String?  @default("Segunda a Sexta: 08h às 18h")
+
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@map("tenant_contents")
+}
+
+model ServiceCategory {
+  id         String    @id @default(cuid())
+  tenant_id  String
+  name       String
+  order      Int       @default(0)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  services Service[]
+
+  @@index([tenant_id])
+  @@map("service_categories")
+}
+
+model Service {
+  id                String           @id @default(cuid())
+  tenant_id         String
+  category_id       String?
+  title             String
+  short_description String           @db.Text
+  full_description  String?          @db.Text
+  icon_name         String           @default("Zap") // Lucide icon name
+  order             Int              @default(0)
+  is_featured       Boolean          @default(false)
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @updatedAt
+
+  tenant   Tenant           @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  category ServiceCategory? @relation(fields: [category_id], references: [id], onDelete: SetNull)
+
+  @@index([tenant_id])
+  @@index([category_id])
+  @@map("services")
+}
+
+model Badge {
+  id         String   @id @default(cuid())
+  tenant_id  String
+  label      String
+  value      String
+  icon_name  String   @default("ShieldCheck")
+  order      Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@index([tenant_id])
+  @@map("badges")
+}
+
+model SEOConfig {
+  id                   String   @id @default(cuid())
+  tenant_id            String   @unique
+  meta_title           String
+  meta_description     String   @db.Text
+  keywords             String[] @default([])
+  canonical_url        String?
+  og_image_url         String?
+  schema_business_type String   @default("ProfessionalService") // LocalBusiness, HomeAndConstructionBusiness, ProfessionalService
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@map("seo_configs")
+}
+
+model FAQ {
+  id         String   @id @default(cuid())
+  tenant_id  String
+  question   String
+  answer     String   @db.Text
+  order      Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@index([tenant_id])
+  @@map("faqs")
+}
+
+model Testimonial {
+  id              String   @id @default(cuid())
+  tenant_id       String
+  author_name     String
+  role_or_company String?
+  content         String   @db.Text
+  rating          Int      @default(5)
+  avatar_url      String?
+  order           Int      @default(0)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@index([tenant_id])
+  @@map("testimonials")
+}
+
+model Lead {
+  id               String     @id @default(cuid())
+  tenant_id        String
+  name             String
+  email            String
+  phone            String
+  service_interest String?
+  message          String?    @db.Text
+  status           LeadStatus @default(NEW)
+  created_at       DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@index([tenant_id])
+  @@index([status])
+  @@map("leads")
+}
