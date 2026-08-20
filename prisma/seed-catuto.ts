@@ -87,7 +87,7 @@ export async function seedCatuto() {
           address_city: "Joinville",
           address_state: "SC",
           address_zip: "89228-000",
-          cnpj: "55.934.680/0001-02",
+          cnpj: null,
           professional_register: "Soluções Web & Performance",
           google_maps_url: null,
           working_hours: "Segunda a Sexta: 08h às 18h | Atendimento Online em Todo o Brasil",
@@ -119,9 +119,9 @@ export async function seedCatuto() {
       badges: {
         create: [
           { label: "Especialidade", value: "Websites de Alta Performance", icon_name: "Globe", order: 1 },
-          { label: "Cadastro Nacional", value: "CNPJ 55.934.680/0001-02", icon_name: "ShieldCheck", order: 2 },
+          { label: "Tecnologia", value: "Next.js & Stack Otimizada", icon_name: "Zap", order: 2 },
           { label: "Atendimento", value: "B2B e Pequenas Empresas", icon_name: "Users", order: 3 },
-          { label: "Certificação", value: "Google Performance Ready", icon_name: "Zap", order: 4 },
+          { label: "Certificação", value: "Google Performance Ready", icon_name: "ShieldCheck", order: 4 },
         ],
       },
 

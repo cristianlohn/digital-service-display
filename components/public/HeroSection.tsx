@@ -82,25 +82,37 @@ export function HeroSection({ tenant }: HeroSectionProps) {
             </div>
 
             {/* Micro Trust Indicators */}
-            {badges && badges.length > 0 && (
-              <div className="pt-6 border-t border-slate-200/80 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {badges.slice(0, 3).map((badge) => (
-                  <div key={badge.id} className="flex items-center gap-2 text-left">
-                    <div className="flex-shrink-0 p-1.5 rounded-md bg-emerald-50 text-emerald-600">
-                      <DynamicIcon name={badge.icon_name} size={16} />
+            {badges && badges.length > 0 && (() => {
+              const displayBadges = badges.filter((badge) => {
+                const labelUpper = badge.label.toUpperCase();
+                const valueUpper = badge.value.toUpperCase();
+                const isCnpjBadge = labelUpper.includes("CNPJ") || valueUpper.includes("CNPJ") || labelUpper.includes("CADASTRO NACIONAL");
+                if (isCnpjBadge && !content.cnpj) return false;
+                return true;
+              });
+
+              if (displayBadges.length === 0) return null;
+
+              return (
+                <div className="pt-6 border-t border-slate-200/80 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {displayBadges.slice(0, 3).map((badge) => (
+                    <div key={badge.id} className="flex items-center gap-2 text-left">
+                      <div className="flex-shrink-0 p-1.5 rounded-md bg-emerald-50 text-emerald-600">
+                        <DynamicIcon name={badge.icon_name} size={16} />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider truncate">
+                          {badge.label}
+                        </span>
+                        <span className="text-xs font-bold text-slate-800 truncate">
+                          {badge.value}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider truncate">
-                        {badge.label}
-                      </span>
-                      <span className="text-xs font-bold text-slate-800 truncate">
-                        {badge.value}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Right Column: Hero Visual & Authority Card */}
