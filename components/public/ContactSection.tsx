@@ -234,7 +234,13 @@ export function ContactSection({ tenant }: ContactSectionProps) {
                 <div className="font-bold text-slate-900">
                   {tenant.name}
                 </div>
-                <div>CNPJ: {formatCNPJ(content.cnpj)} {content.professional_register && `| ${content.professional_register}`}</div>
+                <div>
+                  {content.cnpj ? (
+                    <>CNPJ: {formatCNPJ(content.cnpj)} {content.professional_register && `| ${content.professional_register}`}</>
+                  ) : (
+                    <>{content.professional_register || "Atendimento Técnico & Suporte Dedicado"}</>
+                  )}
+                </div>
               </div>
             </div>
           </div>

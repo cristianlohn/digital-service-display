@@ -34,8 +34,8 @@ export function generateJsonLd(tenant: TenantWithRelations, currentUrl: string) 
     image: content?.hero_image_url || theme?.logo_url || undefined,
     telephone: content?.phone || content?.whatsapp_number,
     email: content?.email,
-    taxID: content?.cnpj,
-    vatID: content?.cnpj,
+    taxID: content?.cnpj || undefined,
+    vatID: content?.cnpj || undefined,
     address: content
       ? {
           "@type": "PostalAddress",
