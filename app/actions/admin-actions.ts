@@ -78,39 +78,43 @@ export async function updateContentAction(tenantId: string, formData: FormData) 
       .map((v) => v.trim())
       .filter((v) => v.length > 0);
 
+    const rawFoundedYear = (formData.get("founded_year") as string)?.trim();
+    const parsedYear = rawFoundedYear ? parseInt(rawFoundedYear, 10) : null;
+    const founded_year = parsedYear && !isNaN(parsedYear) ? parsedYear : null;
+
     const data = {
-      hero_title: formData.get("hero_title") as string,
-      hero_subtitle: formData.get("hero_subtitle") as string,
-      cta_primary_text: formData.get("cta_primary_text") as string,
-      cta_whatsapp_text: formData.get("cta_whatsapp_text") as string,
-      hero_image_url: (formData.get("hero_image_url") as string) || null,
+      hero_title: ((formData.get("hero_title") as string) || "").trim(),
+      hero_subtitle: ((formData.get("hero_subtitle") as string) || "").trim(),
+      cta_primary_text: ((formData.get("cta_primary_text") as string) || "Solicitar Orçamento").trim(),
+      cta_whatsapp_text: ((formData.get("cta_whatsapp_text") as string) || "Falar no WhatsApp").trim(),
+      hero_image_url: ((formData.get("hero_image_url") as string) || "").trim() || null,
 
-      about_badge_text: (formData.get("about_badge_text") as string) || null,
-      about_title: formData.get("about_title") as string,
-      about_description: formData.get("about_description") as string,
-      founded_year: formData.get("founded_year") ? parseInt(formData.get("founded_year") as string) : null,
-      about_image_url: (formData.get("about_image_url") as string) || null,
+      about_badge_text: ((formData.get("about_badge_text") as string) || "").trim() || null,
+      about_title: ((formData.get("about_title") as string) || "").trim(),
+      about_description: ((formData.get("about_description") as string) || "").trim(),
+      founded_year: founded_year,
+      about_image_url: ((formData.get("about_image_url") as string) || "").trim() || null,
 
-      mission_text: (formData.get("mission_text") as string) || null,
-      vision_text: (formData.get("vision_text") as string) || null,
+      mission_text: ((formData.get("mission_text") as string) || "").trim() || null,
+      vision_text: ((formData.get("vision_text") as string) || "").trim() || null,
       values: valuesArray,
 
-      phone: (formData.get("phone") as string)?.trim() || null,
-      whatsapp_number: (formData.get("whatsapp_number") as string)?.trim(),
-      email: (formData.get("email") as string)?.trim(),
-      address_street: (formData.get("address_street") as string)?.trim() || null,
-      address_number: (formData.get("address_number") as string)?.trim() || null,
-      address_neighborhood: (formData.get("address_neighborhood") as string)?.trim() || null,
-      address_city: (formData.get("address_city") as string)?.trim() || null,
-      address_state: (formData.get("address_state") as string)?.trim() || null,
-      address_zip: (formData.get("address_zip") as string)?.trim() || null,
-      cnpj: (formData.get("cnpj") as string)?.trim() || null,
-      professional_register: (formData.get("professional_register") as string)?.trim() || null,
-      working_hours: (formData.get("working_hours") as string)?.trim() || null,
-      instagram_url: (formData.get("instagram_url") as string)?.trim() || null,
-      linkedin_url: (formData.get("linkedin_url") as string)?.trim() || null,
-      facebook_url: (formData.get("facebook_url") as string)?.trim() || null,
-      youtube_url: (formData.get("youtube_url") as string)?.trim() || null,
+      phone: ((formData.get("phone") as string) || "").trim() || null,
+      whatsapp_number: ((formData.get("whatsapp_number") as string) || "").trim(),
+      email: ((formData.get("email") as string) || "").trim(),
+      address_street: ((formData.get("address_street") as string) || "").trim() || null,
+      address_number: ((formData.get("address_number") as string) || "").trim() || null,
+      address_neighborhood: ((formData.get("address_neighborhood") as string) || "").trim() || null,
+      address_city: ((formData.get("address_city") as string) || "").trim() || null,
+      address_state: ((formData.get("address_state") as string) || "").trim() || null,
+      address_zip: ((formData.get("address_zip") as string) || "").trim() || null,
+      cnpj: ((formData.get("cnpj") as string) || "").trim() || null,
+      professional_register: ((formData.get("professional_register") as string) || "").trim() || null,
+      working_hours: ((formData.get("working_hours") as string) || "").trim() || null,
+      instagram_url: ((formData.get("instagram_url") as string) || "").trim() || null,
+      linkedin_url: ((formData.get("linkedin_url") as string) || "").trim() || null,
+      facebook_url: ((formData.get("facebook_url") as string) || "").trim() || null,
+      youtube_url: ((formData.get("youtube_url") as string) || "").trim() || null,
     };
 
     await prisma.tenantContent.upsert({
@@ -123,10 +127,11 @@ export async function updateContentAction(tenantId: string, formData: FormData) 
     });
 
     revalidatePath("/", "layout");
+    revalidatePath("/admin/content");
     return { success: true, message: "Conteúdo salvo com sucesso!" };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erro ao salvar conteúdo:", error);
-    return { success: false, message: "Erro ao atualizar o conteúdo." };
+    return { success: false, message: error?.message || "Erro ao atualizar o conteúdo." };
   }
 }
 
