@@ -34,9 +34,9 @@ export function SettingsThemeForm({ tenantId, theme }: SettingsThemeFormProps) {
       primary_color: formData.get("primary_color") as string,
       secondary_color: formData.get("secondary_color") as string,
       font_family: formData.get("font_family") as string,
-      logo_url: (formData.get("logo_url") as string) || undefined,
-      favicon_url: (formData.get("favicon_url") as string) || undefined,
-      background_image_url: (formData.get("background_image_url") as string) || undefined,
+      logo_url: (formData.get("logo_url") as string) || null,
+      favicon_url: (formData.get("favicon_url") as string) || null,
+      background_image_url: (formData.get("background_image_url") as string) || null,
     });
 
     if (result.success) {

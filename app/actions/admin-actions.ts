@@ -38,34 +38,44 @@ export async function updateSectionTogglesAction(tenantId: string, settingsData:
   }
 }
 
-// 2. Atualizar Tema Visual
+// 2. Atualizar Tema Visual & Favicon
 export async function updateThemeAction(tenantId: string, themeData: {
   primary_color: string;
   secondary_color: string;
   font_family: string;
-  logo_url?: string;
-  favicon_url?: string;
-  background_image_url?: string;
+  logo_url?: string | null;
+  favicon_url?: string | null;
+  background_image_url?: string | null;
   dark_mode_enabled?: boolean;
 }) {
   try {
     await requireAuth();
 
+    const data = {
+      primary_color: (themeData.primary_color || "#0f172a").trim(),
+      secondary_color: (themeData.secondary_color || "#f59e0b").trim(),
+      font_family: (themeData.font_family || "Inter").trim(),
+      logo_url: themeData.logo_url ? themeData.logo_url.trim() : null,
+      favicon_url: themeData.favicon_url ? themeData.favicon_url.trim() : null,
+      background_image_url: themeData.background_image_url ? themeData.background_image_url.trim() : null,
+      dark_mode_enabled: themeData.dark_mode_enabled ?? false,
+    };
+
     await prisma.tenantTheme.upsert({
       where: { tenant_id: tenantId },
-      update: themeData,
+      update: data,
       create: {
         tenant_id: tenantId,
-        ...themeData,
+        ...data,
       },
     });
 
     revalidatePath("/", "layout");
     revalidatePath("/admin/settings");
-    return { success: true, message: "Tema visual atualizado com sucesso!" };
-  } catch (error) {
+    return { success: true, message: "Tema visual e Favicon atualizados com sucesso!" };
+  } catch (error: any) {
     console.error("Erro ao atualizar tema:", error);
-    return { success: false, message: "Erro ao salvar tema." };
+    return { success: false, message: error?.message || "Erro ao salvar tema." };
   }
 }
 
@@ -74,27 +84,35 @@ export async function updateSeoAction(tenantId: string, seoData: {
   meta_title: string;
   meta_description: string;
   keywords?: string[];
-  og_image_url?: string;
-  canonical_url?: string;
+  og_image_url?: string | null;
+  canonical_url?: string | null;
 }) {
   try {
     await requireAuth();
 
+    const data = {
+      meta_title: (seoData.meta_title || "").trim(),
+      meta_description: (seoData.meta_description || "").trim(),
+      keywords: seoData.keywords || [],
+      og_image_url: seoData.og_image_url ? seoData.og_image_url.trim() : null,
+      canonical_url: seoData.canonical_url ? seoData.canonical_url.trim() : null,
+    };
+
     await prisma.sEOConfig.upsert({
       where: { tenant_id: tenantId },
-      update: seoData,
+      update: data,
       create: {
         tenant_id: tenantId,
-        ...seoData,
+        ...data,
       },
     });
 
     revalidatePath("/", "layout");
     revalidatePath("/admin/settings");
-    return { success: true, message: "SEO e cartão de compartilhamento social atualizados com sucesso!" };
-  } catch (error) {
+    return { success: true, message: "SEO e cartão de compartilhamento do WhatsApp atualizados com sucesso!" };
+  } catch (error: any) {
     console.error("Erro ao atualizar SEO:", error);
-    return { success: false, message: "Erro ao salvar SEO." };
+    return { success: false, message: error?.message || "Erro ao salvar SEO." };
   }
 }
 
