@@ -45,6 +45,7 @@ export async function updateThemeAction(tenantId: string, themeData: {
   font_family: string;
   logo_url?: string;
   favicon_url?: string;
+  background_image_url?: string;
   dark_mode_enabled?: boolean;
 }) {
   try {
@@ -60,6 +61,7 @@ export async function updateThemeAction(tenantId: string, themeData: {
     });
 
     revalidatePath("/", "layout");
+    revalidatePath("/admin/settings");
     return { success: true, message: "Tema visual atualizado com sucesso!" };
   } catch (error) {
     console.error("Erro ao atualizar tema:", error);

@@ -59,16 +59,17 @@ model Tenant {
 }
 
 model TenantTheme {
-  id                String   @id @default(cuid())
-  tenant_id         String   @unique
-  primary_color     String   @default("#0f172a") // Hex code
-  secondary_color   String   @default("#f59e0b") // Hex code
-  font_family       String   @default("Inter")   // Inter, Roboto, Outfit, etc.
-  logo_url          String?
-  favicon_url       String?
-  dark_mode_enabled Boolean  @default(false)
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  tenant_id            String   @unique
+  primary_color        String   @default("#0f172a") // Hex code
+  secondary_color      String   @default("#f59e0b") // Hex code
+  font_family          String   @default("Inter")   // Inter, Roboto, Outfit, etc.
+  logo_url             String?
+  favicon_url          String?
+  background_image_url String?  // Imagem de fundo personalizada (ex: Hero/Site)
+  dark_mode_enabled    Boolean  @default(false)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
 
   tenant Tenant @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
 

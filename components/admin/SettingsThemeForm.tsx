@@ -15,6 +15,7 @@ interface SettingsThemeFormProps {
     font_family: string;
     logo_url?: string | null;
     favicon_url?: string | null;
+    background_image_url?: string | null;
   } | null;
 }
 
@@ -35,6 +36,7 @@ export function SettingsThemeForm({ tenantId, theme }: SettingsThemeFormProps) {
       font_family: formData.get("font_family") as string,
       logo_url: (formData.get("logo_url") as string) || undefined,
       favicon_url: (formData.get("favicon_url") as string) || undefined,
+      background_image_url: (formData.get("background_image_url") as string) || undefined,
     });
 
     if (result.success) {
@@ -74,9 +76,10 @@ export function SettingsThemeForm({ tenantId, theme }: SettingsThemeFormProps) {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* Cor Primária */}
           <div>
             <label htmlFor="primary_color" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Cor Primária (Hexadecimal)
+              Cor Primária (Hex)
             </label>
             <div className="flex items-center gap-3">
               <input
@@ -85,20 +88,21 @@ export function SettingsThemeForm({ tenantId, theme }: SettingsThemeFormProps) {
                 name="primary_color"
                 value={primaryColor}
                 onChange={(e) => setPrimaryColor(e.target.value)}
-                className="h-10 w-14 rounded-lg border border-slate-200 cursor-pointer p-1"
+                className="h-10 w-14 rounded-lg border border-slate-300 cursor-pointer p-0.5 bg-white"
               />
               <input
                 type="text"
                 value={primaryColor}
                 onChange={(e) => setPrimaryColor(e.target.value)}
-                className="flex-1 rounded-xl border border-slate-300 px-3.5 py-2 text-sm uppercase"
+                className="flex-1 rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono uppercase"
               />
             </div>
           </div>
 
+          {/* Cor Secundária / Destaque */}
           <div>
             <label htmlFor="secondary_color" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Cor Secundária / Destaque (Hexadecimal)
+              Cor de Destaque / Botões (Hex)
             </label>
             <div className="flex items-center gap-3">
               <input
@@ -107,13 +111,13 @@ export function SettingsThemeForm({ tenantId, theme }: SettingsThemeFormProps) {
                 name="secondary_color"
                 value={secondaryColor}
                 onChange={(e) => setSecondaryColor(e.target.value)}
-                className="h-10 w-14 rounded-lg border border-slate-200 cursor-pointer p-1"
+                className="h-10 w-14 rounded-lg border border-slate-300 cursor-pointer p-0.5 bg-white"
               />
               <input
                 type="text"
                 value={secondaryColor}
                 onChange={(e) => setSecondaryColor(e.target.value)}
-                className="flex-1 rounded-xl border border-slate-300 px-3.5 py-2 text-sm uppercase"
+                className="flex-1 rounded-xl border border-slate-300 px-3.5 py-2 text-sm font-mono uppercase"
               />
             </div>
           </div>
@@ -154,6 +158,18 @@ export function SettingsThemeForm({ tenantId, theme }: SettingsThemeFormProps) {
               maxHeight={128}
               quality={0.85}
               helperText="Ícone exibido na aba do navegador (128x128)."
+            />
+          </div>
+
+          <div className="sm:col-span-2 pt-2 border-t border-slate-100">
+            <ImageUpload
+              name="background_image_url"
+              label="Imagem de Fundo Panorâmica (Hero / Capa do Site)"
+              defaultValue={theme?.background_image_url || ""}
+              maxWidth={1920}
+              maxHeight={1080}
+              quality={0.82}
+              helperText="Imagem de fundo de alta resolução (ex: fábrica, máquinas, tecnologia) com ajuste automático de contraste e compressão WebP."
             />
           </div>
         </div>

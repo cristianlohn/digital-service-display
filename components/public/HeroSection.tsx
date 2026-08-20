@@ -22,6 +22,21 @@ export function HeroSection({ tenant }: HeroSectionProps) {
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50/50 py-16 sm:py-24 lg:py-32">
+      {/* Dynamic Background Image if configured */}
+      {theme?.background_image_url && (
+        <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none">
+          <Image
+            src={theme.background_image_url}
+            alt={`${tenant.name} Background`}
+            fill
+            className="object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/85 to-white/70 backdrop-blur-[0.5px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white" />
+        </div>
+      )}
+
       {/* Background geometric accents */}
       <div className="absolute inset-0 subtle-grid-bg pointer-events-none opacity-40" />
       <div
