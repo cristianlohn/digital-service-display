@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { TenantWithRelations } from "@/lib/tenant";
 import { formatCNPJ, formatPhone } from "@/lib/utils";
+import { CatutoBrand } from "./CatutoBrand";
 import { ShieldCheck, MapPin, Mail, Phone, ArrowUp, Instagram, Linkedin, Facebook, Youtube, ExternalLink } from "lucide-react";
 
 interface FooterProps {
@@ -181,24 +182,13 @@ export function Footer({ tenant }: FooterProps) {
         </div>
 
         {/* Bottom Bar: Copyright & Developer Credit */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 text-center sm:text-left">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-slate-500 text-center sm:text-left">
           <div>
             &copy; {currentYear} {tenant.name}. Todos os direitos reservados.
           </div>
 
-          {/* Catuto Soluções Digitais Credit */}
-          <div className="flex items-center gap-2 text-slate-400">
-            <span>Desenvolvido por</span>
-            <a
-              href="https://catuto.com.br"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold text-white hover:text-tenant-secondary transition-colors inline-flex items-center gap-1 group"
-            >
-              <span>Catuto Soluções Digitais</span>
-              <ExternalLink size={12} className="text-slate-500 group-hover:text-tenant-secondary transition-colors" />
-            </a>
-          </div>
+          {/* Catuto Soluções Digitais Official Brand Badge */}
+          <CatutoBrand />
 
           <div>
             <a

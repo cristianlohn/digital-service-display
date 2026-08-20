@@ -28,6 +28,10 @@ const config: Config = {
           secondary: "var(--tenant-secondary, #f59e0b)",
           "secondary-hover": "var(--tenant-secondary-hover, #d97706)",
         },
+        catuto: {
+          bg: "#121212",
+          neon: "#00FF41",
+        },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -35,6 +39,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--tenant-font, var(--font-inter, sans-serif))"],
+        montserrat: ["var(--font-montserrat, sans-serif)"],
       },
       borderRadius: {
         lg: "var(--radius)",
