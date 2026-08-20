@@ -4,16 +4,20 @@ import { useFormState, useFormStatus } from "react-dom";
 import { TenantWithRelations } from "@/lib/tenant";
 import { createLeadAction, CreateLeadState } from "@/app/actions/lead-actions";
 import { buildWhatsAppLink, formatCNPJ, formatPhone } from "@/lib/utils";
+import { WhatsAppIcon } from "./WhatsAppIcon";
 import {
   Phone,
   Mail,
   MapPin,
   Clock,
   Send,
-  MessageCircle,
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
+  Instagram,
+  Linkedin,
+  Facebook,
+  Youtube,
 } from "lucide-react";
 
 interface ContactSectionProps {
@@ -96,8 +100,8 @@ export function ContactSection({ tenant }: ContactSectionProps) {
                   rel="noopener noreferrer"
                   className="flex items-start gap-3.5 text-slate-300 hover:text-white transition-colors"
                 >
-                  <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-400 flex-shrink-0">
-                    <MessageCircle size={18} />
+                  <div className="p-2 rounded-lg bg-[#25D366]/20 text-[#25D366] flex-shrink-0">
+                    <WhatsAppIcon size={18} fillColor="#25D366" />
                   </div>
                   <div>
                     <div className="text-xs text-slate-400 font-medium">WhatsApp Comercial</div>
@@ -144,6 +148,59 @@ export function ContactSection({ tenant }: ContactSectionProps) {
                     </div>
                   </div>
                 )}
+
+                {/* Social Networks inside Contact Card */}
+                {(content.instagram_url || content.linkedin_url || content.facebook_url || content.youtube_url) && (
+                  <div className="pt-3 border-t border-slate-800 space-y-2">
+                    <div className="text-xs text-slate-400 font-medium">Redes Sociais Oficiais</div>
+                    <div className="flex items-center gap-2">
+                      {content.instagram_url && (
+                        <a
+                          href={content.instagram_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-pink-400 hover:bg-slate-700 transition-colors"
+                          aria-label="Instagram"
+                        >
+                          <Instagram size={17} />
+                        </a>
+                      )}
+                      {content.linkedin_url && (
+                        <a
+                          href={content.linkedin_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-blue-400 hover:bg-slate-700 transition-colors"
+                          aria-label="LinkedIn"
+                        >
+                          <Linkedin size={17} />
+                        </a>
+                      )}
+                      {content.facebook_url && (
+                        <a
+                          href={content.facebook_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-blue-500 hover:bg-slate-700 transition-colors"
+                          aria-label="Facebook"
+                        >
+                          <Facebook size={17} />
+                        </a>
+                      )}
+                      {content.youtube_url && (
+                        <a
+                          href={content.youtube_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-red-400 hover:bg-slate-700 transition-colors"
+                          aria-label="YouTube"
+                        >
+                          <Youtube size={17} />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Fast WhatsApp Button */}
@@ -152,9 +209,9 @@ export function ContactSection({ tenant }: ContactSectionProps) {
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 px-4 text-sm font-bold text-white shadow-lg hover:bg-emerald-700 transition-all"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3.5 px-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 hover:bg-[#20bd5a] transition-all"
                 >
-                  <MessageCircle size={18} />
+                  <WhatsAppIcon size={19} fillColor="#FFFFFF" />
                   <span>Conversar Imediatamente no WhatsApp</span>
                 </a>
               </div>

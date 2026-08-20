@@ -97,9 +97,12 @@ export async function updateContentAction(tenantId: string, formData: FormData) 
       address_city: formData.get("address_city") as string,
       address_state: formData.get("address_state") as string,
       address_zip: formData.get("address_zip") as string,
-      cnpj: formData.get("cnpj") as string,
       professional_register: (formData.get("professional_register") as string) || null,
       working_hours: (formData.get("working_hours") as string) || null,
+      instagram_url: (formData.get("instagram_url") as string) || null,
+      linkedin_url: (formData.get("linkedin_url") as string) || null,
+      facebook_url: (formData.get("facebook_url") as string) || null,
+      youtube_url: (formData.get("youtube_url") as string) || null,
     };
 
     await prisma.tenantContent.upsert({

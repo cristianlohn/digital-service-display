@@ -4,7 +4,8 @@ import { useState } from "react";
 import { TenantWithRelations } from "@/lib/tenant";
 import { buildWhatsAppLink } from "@/lib/utils";
 import { DynamicIcon } from "./DynamicIcon";
-import { ArrowRight, MessageCircle, Layers, CheckCircle2 } from "lucide-react";
+import { WhatsAppIcon } from "./WhatsAppIcon";
+import { ArrowRight, Layers, CheckCircle2 } from "lucide-react";
 
 interface ServicesSectionProps {
   tenant: TenantWithRelations;
@@ -119,9 +120,9 @@ export function ServicesSection({ tenant }: ServicesSectionProps) {
                     href={whatsappMsg}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 hover:text-emerald-800 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1e9e4f] hover:text-[#187f40] transition-colors"
                   >
-                    <MessageCircle size={15} />
+                    <WhatsAppIcon size={14} fillColor="#1e9e4f" />
                     <span>Pedir Orçamento</span>
                   </a>
 

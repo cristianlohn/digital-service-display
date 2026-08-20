@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { TenantWithRelations } from "@/lib/tenant";
 import { formatCNPJ, formatPhone } from "@/lib/utils";
-import { ShieldCheck, MapPin, Mail, Phone, ArrowUp } from "lucide-react";
+import { ShieldCheck, MapPin, Mail, Phone, ArrowUp, Instagram, Linkedin, Facebook, Youtube, ExternalLink } from "lucide-react";
 
 interface FooterProps {
   tenant: TenantWithRelations;
@@ -30,6 +30,56 @@ export function Footer({ tenant }: FooterProps) {
               <div className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-1.5 text-xs text-slate-300 border border-slate-800">
                 <ShieldCheck size={14} className="text-tenant-secondary" />
                 <span>{content.professional_register}</span>
+              </div>
+            )}
+
+            {/* Social Media Links */}
+            {(content?.instagram_url || content?.linkedin_url || content?.facebook_url || content?.youtube_url) && (
+              <div className="pt-2 flex items-center gap-2.5">
+                {content?.instagram_url && (
+                  <a
+                    href={content.instagram_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg bg-slate-900 text-slate-400 hover:text-pink-400 hover:bg-slate-800 transition-colors"
+                    aria-label="Instagram"
+                  >
+                    <Instagram size={17} />
+                  </a>
+                )}
+                {content?.linkedin_url && (
+                  <a
+                    href={content.linkedin_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg bg-slate-900 text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-colors"
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin size={17} />
+                  </a>
+                )}
+                {content?.facebook_url && (
+                  <a
+                    href={content.facebook_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg bg-slate-900 text-slate-400 hover:text-blue-500 hover:bg-slate-800 transition-colors"
+                    aria-label="Facebook"
+                  >
+                    <Facebook size={17} />
+                  </a>
+                )}
+                {content?.youtube_url && (
+                  <a
+                    href={content.youtube_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg bg-slate-900 text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors"
+                    aria-label="YouTube"
+                  >
+                    <Youtube size={17} />
+                  </a>
+                )}
               </div>
             )}
           </div>
@@ -130,17 +180,30 @@ export function Footer({ tenant }: FooterProps) {
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        {/* Bottom Bar: Copyright & Developer Credit */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 text-center sm:text-left">
           <div>
             &copy; {currentYear} {tenant.name}. Todos os direitos reservados.
           </div>
 
-          <div className="flex items-center gap-6">
-            <span>Desenvolvido com tecnologia White-Label Multi-Tenant</span>
+          {/* Catuto Soluções Digitais Credit */}
+          <div className="flex items-center gap-2 text-slate-400">
+            <span>Desenvolvido por</span>
+            <a
+              href="https://catuto.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-white hover:text-tenant-secondary transition-colors inline-flex items-center gap-1 group"
+            >
+              <span>Catuto Soluções Digitais</span>
+              <ExternalLink size={12} className="text-slate-500 group-hover:text-tenant-secondary transition-colors" />
+            </a>
+          </div>
+
+          <div>
             <a
               href="#"
-              className="p-2 rounded-lg bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-2 rounded-lg bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors inline-block"
               aria-label="Voltar ao topo"
             >
               <ArrowUp size={16} />

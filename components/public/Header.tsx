@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { TenantWithRelations } from "@/lib/tenant";
 import { buildWhatsAppLink, formatPhone } from "@/lib/utils";
-import { Phone, MessageCircle, Menu, X, ShieldCheck } from "lucide-react";
+import { WhatsAppIcon } from "./WhatsAppIcon";
+import { Phone, Menu, X, ShieldCheck, Instagram, Linkedin, Facebook, Youtube } from "lucide-react";
 
 interface HeaderProps {
   tenant: TenantWithRelations;
@@ -29,13 +30,13 @@ export function Header({ tenant }: HeaderProps) {
           {/* Logo / Brand Name */}
           <Link href="/" className="flex items-center gap-3 group">
             {theme?.logo_url ? (
-              <div className="relative h-12 w-36 sm:w-44 overflow-hidden rounded-lg transition-transform group-hover:scale-105">
+              <div className="relative h-12 w-36 sm:w-48 overflow-hidden rounded-lg transition-transform group-hover:scale-105">
                 <Image
                   src={theme.logo_url}
                   alt={tenant.name}
                   fill
                   className="object-contain object-left"
-                  sizes="(max-width: 640px) 144px, 176px"
+                  sizes="(max-width: 640px) 144px, 192px"
                   priority
                 />
               </div>
@@ -45,7 +46,7 @@ export function Header({ tenant }: HeaderProps) {
                   {tenant.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold tracking-tight text-slate-900 leading-tight">
+                  <span className="text-base sm:text-lg font-bold tracking-tight text-slate-900 leading-tight">
                     {tenant.name}
                   </span>
                   {content?.professional_register && (
@@ -103,8 +104,56 @@ export function Header({ tenant }: HeaderProps) {
             )}
           </nav>
 
-          {/* Desktop Action Buttons */}
+          {/* Desktop Action Buttons & Socials */}
           <div className="hidden lg:flex items-center gap-4">
+            {/* Social Media Links */}
+            <div className="flex items-center gap-2 border-r border-slate-200 pr-3">
+              {content?.instagram_url && (
+                <a
+                  href={content.instagram_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-pink-600 hover:bg-pink-50 transition-colors"
+                  aria-label="Instagram"
+                >
+                  <Instagram size={17} />
+                </a>
+              )}
+              {content?.linkedin_url && (
+                <a
+                  href={content.linkedin_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin size={17} />
+                </a>
+              )}
+              {content?.facebook_url && (
+                <a
+                  href={content.facebook_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+                  aria-label="Facebook"
+                >
+                  <Facebook size={17} />
+                </a>
+              )}
+              {content?.youtube_url && (
+                <a
+                  href={content.youtube_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                  aria-label="YouTube"
+                >
+                  <Youtube size={17} />
+                </a>
+              )}
+            </div>
+
             {content?.phone && (
               <a
                 href={`tel:${content.phone.replace(/\D/g, "")}`}
@@ -114,13 +163,14 @@ export function Header({ tenant }: HeaderProps) {
                 <span>{formatPhone(content.phone)}</span>
               </a>
             )}
+
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 transition-all active:scale-95"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#20bd5a] transition-all active:scale-95 shadow-emerald-500/20"
             >
-              <MessageCircle size={16} />
+              <WhatsAppIcon size={16} fillColor="#FFFFFF" />
               <span>WhatsApp</span>
             </a>
           </div>
@@ -131,10 +181,10 @@ export function Header({ tenant }: HeaderProps) {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+              className="p-2 rounded-lg bg-[#25D366] text-white shadow-sm hover:bg-[#20bd5a]"
               aria-label="Falar no WhatsApp"
             >
-              <MessageCircle size={20} />
+              <WhatsAppIcon size={18} fillColor="#FFFFFF" />
             </a>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -149,13 +199,13 @@ export function Header({ tenant }: HeaderProps) {
 
       {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-lg px-4 pt-4 pb-6 space-y-4 shadow-xl">
-          <nav className="flex flex-col space-y-3 text-base font-medium text-slate-800">
+        <div className="md:hidden border-t border-slate-200 bg-white/98 backdrop-blur-xl px-5 pt-4 pb-6 space-y-4 shadow-2xl animate-in slide-in-from-top-2 duration-200">
+          <nav className="flex flex-col space-y-3 text-base font-semibold text-slate-800">
             {settings?.show_services && (
               <Link
                 href="#servicos"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1 px-2 rounded-md hover:bg-slate-50"
+                className="py-2 px-3 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 Serviços Especializados
               </Link>
@@ -164,7 +214,7 @@ export function Header({ tenant }: HeaderProps) {
               <Link
                 href="#sobre"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1 px-2 rounded-md hover:bg-slate-50"
+                className="py-2 px-3 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 Sobre a Empresa
               </Link>
@@ -173,7 +223,7 @@ export function Header({ tenant }: HeaderProps) {
               <Link
                 href="#diferenciais"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1 px-2 rounded-md hover:bg-slate-50"
+                className="py-2 px-3 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 Certificações e Normas
               </Link>
@@ -182,7 +232,7 @@ export function Header({ tenant }: HeaderProps) {
               <Link
                 href="#faq"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1 px-2 rounded-md hover:bg-slate-50"
+                className="py-2 px-3 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 Perguntas Frequentes
               </Link>
@@ -191,18 +241,69 @@ export function Header({ tenant }: HeaderProps) {
               <Link
                 href="#contato"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-1 px-2 rounded-md hover:bg-slate-50"
+                className="py-2 px-3 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 Fale Conosco
               </Link>
             )}
           </nav>
 
+          {/* Social Links on Mobile */}
+          {(content?.instagram_url || content?.linkedin_url || content?.facebook_url || content?.youtube_url) && (
+            <div className="flex items-center gap-3 pt-2 border-t border-slate-100 px-3">
+              <span className="text-xs font-semibold text-slate-400">Siga-nos:</span>
+              {content?.instagram_url && (
+                <a
+                  href={content.instagram_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-lg bg-pink-50 text-pink-600"
+                  aria-label="Instagram"
+                >
+                  <Instagram size={18} />
+                </a>
+              )}
+              {content?.linkedin_url && (
+                <a
+                  href={content.linkedin_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-lg bg-blue-50 text-blue-600"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin size={18} />
+                </a>
+              )}
+              {content?.facebook_url && (
+                <a
+                  href={content.facebook_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-lg bg-blue-50 text-blue-700"
+                  aria-label="Facebook"
+                >
+                  <Facebook size={18} />
+                </a>
+              )}
+              {content?.youtube_url && (
+                <a
+                  href={content.youtube_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-lg bg-red-50 text-red-600"
+                  aria-label="YouTube"
+                >
+                  <Youtube size={18} />
+                </a>
+              )}
+            </div>
+          )}
+
           <div className="pt-2 border-t border-slate-100 flex flex-col gap-3">
             {content?.phone && (
               <a
                 href={`tel:${content.phone.replace(/\D/g, "")}`}
-                className="flex items-center gap-2 text-sm text-slate-700 py-1"
+                className="flex items-center gap-2 text-sm text-slate-700 py-1 px-3"
               >
                 <Phone size={16} className="text-slate-400" />
                 <span>{formatPhone(content.phone)}</span>
@@ -212,10 +313,10 @@ export function Header({ tenant }: HeaderProps) {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 py-3 text-sm font-semibold text-white shadow hover:bg-emerald-700"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3.5 text-sm font-bold text-white shadow hover:bg-[#20bd5a]"
             >
-              <MessageCircle size={18} />
-              <span>Falar no WhatsApp</span>
+              <WhatsAppIcon size={20} fillColor="#FFFFFF" />
+              <span>Falar no WhatsApp Oficial</span>
             </a>
           </div>
         </div>

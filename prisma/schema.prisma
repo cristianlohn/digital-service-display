@@ -129,6 +129,12 @@ model TenantContent {
   google_maps_url       String?  @db.Text
   working_hours         String?  @default("Segunda a Sexta: 08h às 18h")
 
+  // Redes Sociais
+  instagram_url         String?
+  linkedin_url          String?
+  facebook_url          String?
+  youtube_url           String?
+
   created_at            DateTime @default(now())
   updated_at            DateTime @updatedAt
 

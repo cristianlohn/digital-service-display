@@ -92,6 +92,8 @@ async function main() {
           professional_register: "CREA-SC 223232-2",
           google_maps_url: "https://maps.google.com/?q=Rua+dos+Caruaras+479+Joinville+SC",
           working_hours: "Segunda a Sexta: 07h30 às 18h00 | Atendimento de Emergência Industrial 24h",
+          instagram_url: "https://instagram.com/dall.automacao",
+          linkedin_url: "https://linkedin.com/company/dall-automacao",
         },
       },
 

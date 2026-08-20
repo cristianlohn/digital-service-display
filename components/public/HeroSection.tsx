@@ -3,7 +3,8 @@ import Link from "next/link";
 import { TenantWithRelations } from "@/lib/tenant";
 import { buildWhatsAppLink } from "@/lib/utils";
 import { DynamicIcon } from "./DynamicIcon";
-import { ArrowRight, MessageCircle, CheckCircle } from "lucide-react";
+import { WhatsAppIcon } from "./WhatsAppIcon";
+import { ArrowRight, CheckCircle } from "lucide-react";
 
 interface HeroSectionProps {
   tenant: TenantWithRelations;
@@ -72,9 +73,9 @@ export function HeroSection({ tenant }: HeroSectionProps) {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-xl bg-emerald-600 px-7 py-4 text-sm font-semibold text-white shadow-lg shadow-emerald-600/15 hover:bg-emerald-700 hover:shadow-xl transition-all active:scale-95"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-xl bg-[#25D366] px-7 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 hover:bg-[#20bd5a] hover:shadow-xl transition-all active:scale-95"
               >
-                <MessageCircle size={18} />
+                <WhatsAppIcon size={20} fillColor="#FFFFFF" />
                 <span>{content.cta_whatsapp_text || "Falar no WhatsApp"}</span>
               </a>
             </div>

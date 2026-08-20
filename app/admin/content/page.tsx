@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { updateContentAction } from "@/app/actions/admin-actions";
 import { ImageUpload } from "@/components/admin/ImageUpload";
-import { FileText, CheckCircle2 } from "lucide-react";
+import { FileText, CheckCircle2, Share2 } from "lucide-react";
 
 export default async function AdminContentPage() {
   const tenant = await prisma.tenant.findFirst({
@@ -408,6 +408,75 @@ export default async function AdminContentPage() {
                 defaultValue={content?.address_zip}
                 required
                 placeholder="89228-000"
+                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 5. Redes Sociais Oficiais */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm space-y-5">
+          <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+            <Share2 size={18} className="text-tenant-secondary" />
+            <span>5. Redes Sociais Oficiais</span>
+          </h3>
+          <p className="text-xs text-slate-500">
+            Informe as URLs completas dos perfis da empresa. Os ícones serão exibidos no cabeçalho, rodapé e bloco de contato.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label htmlFor="instagram_url" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Instagram (URL Completa)
+              </label>
+              <input
+                type="url"
+                id="instagram_url"
+                name="instagram_url"
+                defaultValue={content?.instagram_url || ""}
+                placeholder="https://instagram.com/dall.automacao"
+                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="linkedin_url" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                LinkedIn (URL Completa)
+              </label>
+              <input
+                type="url"
+                id="linkedin_url"
+                name="linkedin_url"
+                defaultValue={content?.linkedin_url || ""}
+                placeholder="https://linkedin.com/company/dall-automacao"
+                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="facebook_url" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Facebook (URL Completa)
+              </label>
+              <input
+                type="url"
+                id="facebook_url"
+                name="facebook_url"
+                defaultValue={content?.facebook_url || ""}
+                placeholder="https://facebook.com/dallautomacao"
+                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="youtube_url" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                YouTube (URL Completa)
+              </label>
+              <input
+                type="url"
+                id="youtube_url"
+                name="youtube_url"
+                defaultValue={content?.youtube_url || ""}
+                placeholder="https://youtube.com/@dallautomacao"
                 className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm"
               />
             </div>
