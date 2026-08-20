@@ -1,11 +1,19 @@
 import { prisma } from "@/lib/prisma";
+import { getAdminActiveTenant } from "@/lib/admin-tenant";
 import { updateLeadStatusAction } from "@/app/actions/admin-actions";
 import { buildWhatsAppLink, formatPhone } from "@/lib/utils";
 import { LeadStatus } from "@prisma/client";
 import { MessageCircle, Mail, Clock, CheckCircle, Archive } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminLeadsPage() {
-  const tenant = await prisma.tenant.findFirst({
+  const activeTenant = await getAdminActiveTenant();
+
+  if (!activeTenant) return <div>Empresa não encontrada.</div>;
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: activeTenant.id },
     include: {
       leads: {
         orderBy: { created_at: "desc" },
@@ -13,7 +21,7 @@ export default async function AdminLeadsPage() {
     },
   });
 
-  if (!tenant) return <div>Tenant não encontrado.</div>;
+  if (!tenant) return <div>Empresa não encontrada.</div>;
 
   async function handleStatusChange(formData: FormData) {
     "use server";

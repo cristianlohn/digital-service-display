@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { getAdminActiveTenant } from "@/lib/admin-tenant";
 import { LogoutButton } from "@/components/admin/LogoutButton";
+import { TenantSwitcher } from "@/components/admin/TenantSwitcher";
 import {
   LayoutDashboard,
   FileText,
@@ -10,7 +12,6 @@ import {
   Users,
   ExternalLink,
   Shield,
-  UserCheck,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -27,23 +28,15 @@ export default async function AdminLayout({
     return <div className="min-h-screen bg-slate-950">{children}</div>;
   }
 
-  let tenant = null;
+  const tenant = await getAdminActiveTenant();
+  let allTenants: Array<{ id: string; name: string; slug: string }> = [];
 
-  try {
-    if (user.tenantId) {
-      tenant = await prisma.tenant.findUnique({
-        where: { id: user.tenantId },
-        include: { theme: true },
-      });
-    }
-
-    if (!tenant) {
-      tenant = await prisma.tenant.findFirst({
-        include: { theme: true },
-      });
-    }
-  } catch (error) {
-    console.error("Erro ao buscar tenant no admin layout:", error);
+  if (user.role === "SUPER_ADMIN") {
+    allTenants = await prisma.tenant.findMany({
+      where: { status: "ACTIVE" },
+      select: { id: true, name: true, slug: true },
+      orderBy: { name: "asc" },
+    });
   }
 
   return (
@@ -61,7 +54,7 @@ export default async function AdminLayout({
                 Painel White-Label
               </h1>
               <p className="text-xs text-slate-400 truncate max-w-[140px]">
-                {tenant?.name || "Plataforma SaaS"}
+                {tenant?.name || "Catuto Soluções Digitais"}
               </p>
             </div>
           </div>
@@ -144,15 +137,24 @@ export default async function AdminLayout({
       {/* Main Admin Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <span className="font-semibold text-slate-900">Empresa Ativa:</span>
-            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-xs font-bold text-slate-700">
-              {tenant?.name || "Catuto Soluções Digitais"}
-            </span>
-            {tenant?.custom_domain && (
-              <span className="text-xs text-slate-400">
-                ({tenant.custom_domain})
-              </span>
+          <div className="flex items-center gap-3">
+            {user.role === "SUPER_ADMIN" && allTenants.length > 1 ? (
+              <TenantSwitcher
+                currentTenantId={tenant?.id || ""}
+                tenants={allTenants}
+              />
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <span className="font-semibold text-slate-900">Empresa Ativa:</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-xs font-bold text-slate-700">
+                  {tenant?.name || "Catuto Soluções Digitais"}
+                </span>
+                {tenant?.custom_domain && (
+                  <span className="text-xs text-slate-400">
+                    ({tenant.custom_domain})
+                  </span>
+                )}
+              </div>
             )}
           </div>
 

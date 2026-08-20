@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getAdminActiveTenant } from "@/lib/admin-tenant";
 import Link from "next/link";
 import { formatPhone } from "@/lib/utils";
 import {
@@ -11,8 +12,24 @@ import {
   MessageSquare,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboardPage() {
-  const tenant = await prisma.tenant.findFirst({
+  const activeTenant = await getAdminActiveTenant();
+
+  if (!activeTenant) {
+    return (
+      <div className="p-8 bg-white rounded-xl shadow-sm border border-slate-200">
+        <h2 className="text-xl font-bold text-slate-900">Nenhum Tenant Encontrado</h2>
+        <p className="text-sm text-slate-500 mt-2">
+          Execute o comando de seed: <code className="bg-slate-100 p-1 rounded">npm run prisma:seed</code>
+        </p>
+      </div>
+    );
+  }
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: activeTenant.id },
     include: {
       settings: true,
       services: true,
@@ -32,14 +49,7 @@ export default async function AdminDashboardPage() {
   });
 
   if (!tenant) {
-    return (
-      <div className="p-8 bg-white rounded-xl shadow-sm border border-slate-200">
-        <h2 className="text-xl font-bold text-slate-900">Nenhum Tenant Encontrado</h2>
-        <p className="text-sm text-slate-500 mt-2">
-          Execute o comando de seed: <code className="bg-slate-100 p-1 rounded">npm run prisma:seed</code>
-        </p>
-      </div>
-    );
+    return <div>Empresa não encontrada.</div>;
   }
 
   const newLeadsCount = await prisma.lead.count({

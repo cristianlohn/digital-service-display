@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getAdminActiveTenant } from "@/lib/admin-tenant";
 import { CreateServiceForm } from "@/components/admin/CreateServiceForm";
 import { DeleteServiceButton } from "@/components/admin/DeleteServiceButton";
 import { DynamicIcon } from "@/components/public/DynamicIcon";
@@ -7,7 +8,12 @@ import { Plus, Layers } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function AdminServicesPage() {
-  const tenant = await prisma.tenant.findFirst({
+  const activeTenant = await getAdminActiveTenant();
+
+  if (!activeTenant) return <div>Empresa não encontrada.</div>;
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: activeTenant.id },
     include: {
       categories: {
         include: {
@@ -22,7 +28,7 @@ export default async function AdminServicesPage() {
     },
   });
 
-  if (!tenant) return <div>Tenant não encontrado.</div>;
+  if (!tenant) return <div>Empresa não encontrada.</div>;
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">

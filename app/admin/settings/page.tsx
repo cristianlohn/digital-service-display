@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { getAdminActiveTenant } from "@/lib/admin-tenant";
 import { SettingsTogglesForm } from "@/components/admin/SettingsTogglesForm";
 import { SettingsThemeForm } from "@/components/admin/SettingsThemeForm";
 import { Sliders, Palette } from "lucide-react";
@@ -6,14 +7,9 @@ import { Sliders, Palette } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
-  const tenant = await prisma.tenant.findFirst({
-    include: {
-      settings: true,
-      theme: true,
-    },
-  });
+  const tenant = await getAdminActiveTenant();
 
-  if (!tenant) return <div>Tenant não encontrado.</div>;
+  if (!tenant) return <div>Empresa não encontrada.</div>;
 
   const { settings, theme } = tenant;
 

@@ -1,14 +1,20 @@
 import { prisma } from "@/lib/prisma";
+import { getAdminActiveTenant } from "@/lib/admin-tenant";
 import { ContentForm } from "@/components/admin/ContentForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminContentPage() {
-  const tenant = await prisma.tenant.findFirst({
+  const activeTenant = await getAdminActiveTenant();
+
+  if (!activeTenant) return <div>Empresa não encontrada.</div>;
+
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: activeTenant.id },
     include: { content: true },
   });
 
-  if (!tenant) return <div>Tenant não encontrado.</div>;
+  if (!tenant) return <div>Empresa não encontrada.</div>;
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
