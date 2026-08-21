@@ -21,36 +21,41 @@ export function HeroSection({ tenant }: HeroSectionProps) {
   );
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50/50 py-16 sm:py-24 lg:py-32">
+    <section className="relative overflow-hidden py-16 sm:py-24 lg:py-32">
       {/* Dynamic Background Image if configured */}
-      {theme?.background_image_url && (
-        <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none">
+      {theme?.background_image_url ? (
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <Image
             src={theme.background_image_url}
             alt={`${tenant.name} Background`}
             fill
+            unoptimized
             className="object-cover object-center"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/85 to-white/70 backdrop-blur-[0.5px]" />
+          {/* Translucent overlay that reveals the photo while maintaining high text contrast */}
+          <div className="absolute inset-0 bg-white/75 backdrop-blur-[0.5px]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/70 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white" />
         </div>
+      ) : (
+        <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-50 via-white to-slate-50/50">
+          {/* Background geometric accents */}
+          <div className="absolute inset-0 subtle-grid-bg pointer-events-none opacity-40" />
+          <div
+            className="absolute -top-40 right-0 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+            aria-hidden="true"
+          >
+            <div
+              className="relative left-[calc(50%+11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-tenant-primary to-tenant-secondary opacity-20 sm:left-[calc(50%+15rem)] sm:w-[72.1875rem]"
+              style={{
+                clipPath:
+                  "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+              }}
+            />
+          </div>
+        </div>
       )}
-
-      {/* Background geometric accents */}
-      <div className="absolute inset-0 subtle-grid-bg pointer-events-none opacity-40" />
-      <div
-        className="absolute -top-40 right-0 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
-        aria-hidden="true"
-      >
-        <div
-          className="relative left-[calc(50%+11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-tenant-primary to-tenant-secondary opacity-20 sm:left-[calc(50%+15rem)] sm:w-[72.1875rem]"
-          style={{
-            clipPath:
-              "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-          }}
-        />
-      </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
