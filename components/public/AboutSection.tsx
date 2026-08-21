@@ -16,7 +16,7 @@ export function AboutSection({ tenant }: AboutSectionProps) {
   const showExperiencePill = content.founded_year && yearsActive >= 1;
 
   return (
-    <section id="sobre" className="py-20 sm:py-28 bg-white relative">
+    <section id="sobre" className="py-20 sm:py-28 bg-slate-50/70 backdrop-blur-md relative border-t border-slate-200/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column: Image with Floating Stats */}

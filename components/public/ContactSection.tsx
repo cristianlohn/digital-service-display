@@ -56,7 +56,7 @@ export function ContactSection({ tenant }: ContactSectionProps) {
   );
 
   return (
-    <section id="contato" className="py-20 sm:py-28 bg-white relative">
+    <section id="contato" className="py-20 sm:py-28 bg-slate-50/70 backdrop-blur-md relative border-t border-slate-200/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold uppercase tracking-widest text-tenant-secondary">

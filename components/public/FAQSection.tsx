@@ -15,7 +15,7 @@ export function FAQSection({ tenant }: FAQSectionProps) {
   if (!faqs || faqs.length === 0) return null;
 
   return (
-    <section id="faq" className="py-20 sm:py-28 bg-slate-50 border-t border-slate-200/80">
+    <section id="faq" className="py-20 sm:py-28 bg-white/70 backdrop-blur-md border-t border-slate-200/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
         <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-slate-200/80 px-3.5 py-1 text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">

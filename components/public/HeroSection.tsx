@@ -22,25 +22,9 @@ export function HeroSection({ tenant }: HeroSectionProps) {
 
   return (
     <section className="relative overflow-hidden py-16 sm:py-24 lg:py-32">
-      {/* Dynamic Background Image if configured */}
-      {theme?.background_image_url ? (
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <Image
-            src={theme.background_image_url}
-            alt={`${tenant.name} Background`}
-            fill
-            unoptimized
-            className="object-cover object-center"
-            priority
-          />
-          {/* Translucent overlay that reveals the photo while maintaining high text contrast */}
-          <div className="absolute inset-0 bg-white/75 backdrop-blur-[0.5px]" />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/70 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white" />
-        </div>
-      ) : (
+      {/* Background geometric accents if no global background image is set */}
+      {!theme?.background_image_url && (
         <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-50 via-white to-slate-50/50">
-          {/* Background geometric accents */}
           <div className="absolute inset-0 subtle-grid-bg pointer-events-none opacity-40" />
           <div
             className="absolute -top-40 right-0 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"

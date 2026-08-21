@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getTenantByDomainOrSlug } from "@/lib/tenant";
 import { generateJsonLd } from "@/lib/schema";
@@ -170,7 +171,25 @@ export default async function TenantPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: jsonLd }}
       />
 
-      <div className="flex min-h-screen flex-col">
+      {/* Dynamic Fixed Full-Page Background (Desktop & Mobile Optimized) */}
+      {tenant.theme?.background_image_url && (
+        <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+          <Image
+            src={tenant.theme.background_image_url}
+            alt={`${tenant.name} Background`}
+            fill
+            unoptimized
+            className="object-cover object-center scale-105 transform-gpu"
+            priority
+          />
+          {/* Enhanced Translucent Overlay (Higher contrast and visibility) */}
+          <div className="absolute inset-0 bg-slate-900/10" />
+          <div className="absolute inset-0 bg-white/55 backdrop-blur-[0.5px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-white/70" />
+        </div>
+      )}
+
+      <div className="flex min-h-screen flex-col relative z-10">
         {/* Cabeçalho de Navegação */}
         <Header tenant={tenant} />
 
