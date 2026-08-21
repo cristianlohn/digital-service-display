@@ -24,7 +24,7 @@ async function main() {
     data: {
       slug: "dall-automacao",
       name: "D'All Engenharia e Automação",
-      custom_domain: "dallautomacao.com.br",
+      custom_domain: "dallengenharia.com.br",
       status: TenantStatus.ACTIVE,
 
       // Tema Visual
