@@ -27,6 +27,7 @@ export function AboutSection({ tenant }: AboutSectionProps) {
                   src={content.about_image_url}
                   alt={content.about_title}
                   fill
+                  unoptimized
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 450px"
                 />

@@ -128,6 +128,7 @@ export function HeroSection({ tenant }: HeroSectionProps) {
                     src={content.hero_image_url}
                     alt={content.hero_title}
                     fill
+                    unoptimized
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 500px"
                     priority
