@@ -66,23 +66,34 @@ export async function getCurrentUser(): Promise<SessionPayload | null> {
   if (!session) return null;
 
   try {
-    const user = await prisma.adminUser.findUnique({
+    let user = await prisma.adminUser.findUnique({
       where: { id: session.userId },
       select: { id: true, email: true, name: true, role: true, tenant_id: true },
     });
 
-    if (!user) return null;
+    // Se o ID mudou (ex: re-seed), busca pelo e-mail
+    if (!user && session.email) {
+      user = await prisma.adminUser.findUnique({
+        where: { email: session.email },
+        select: { id: true, email: true, name: true, role: true, tenant_id: true },
+      });
+    }
 
-    return {
-      userId: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role as "SUPER_ADMIN" | "TENANT_ADMIN",
-      tenantId: user.tenant_id,
-    };
+    if (user) {
+      return {
+        userId: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role as "SUPER_ADMIN" | "TENANT_ADMIN",
+        tenantId: user.tenant_id,
+      };
+    }
   } catch (error) {
-    return session;
+    console.error("Erro ao validar usuário no banco:", error);
   }
+
+  // Fallback seguro usando o JWT assinado
+  return session;
 }
 
 /**
